@@ -3,7 +3,6 @@ extends CharacterBody3D
 @export var move_speed := 6.5
 @export var acceleration := 22.0
 @export var friction := 28.0
-@export var jump_velocity := 7.0
 @export var dash_speed := 18.0
 @export var max_health := 100.0
 @export var max_stamina := 100.0
@@ -11,17 +10,19 @@ extends CharacterBody3D
 var health := 100.0
 var stamina := 100.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-var attack_cooldown := 0.0
 var dash_cooldown := 0.0
 var invulnerable := 0.0
+var combat: CombatSystem
 
 func _ready() -> void:
     health = max_health
     stamina = max_stamina
     add_to_group("player")
+    combat = CombatSystem.new()
+    add_child(combat)
 
 func _physics_process(delta: float) -> void:
-    attack_cooldown = maxf(attack_cooldown - delta, 0.0)
+    combat.tick(delta)
     dash_cooldown = maxf(dash_cooldown - delta, 0.0)
     invulnerable = maxf(invulnerable - delta, 0.0)
 
@@ -53,13 +54,14 @@ func _physics_process(delta: float) -> void:
     move_and_slide()
 
 func attack() -> void:
-    if attack_cooldown > 0.0:
+    if combat.try_attack(self, false):
+        stamina = maxf(stamina - 5.0, 0.0)
+
+func heavy_attack() -> void:
+    if stamina < 18.0:
         return
-    attack_cooldown = 0.42
-    var hit_range := 2.6
-    for enemy in get_tree().get_nodes_in_group("enemies"):
-        if is_instance_valid(enemy) and global_position.distance_to(enemy.global_position) <= hit_range:
-            enemy.take_damage(28.0, global_position)
+    if combat.try_attack(self, true):
+        stamina -= 18.0
 
 func dash(direction: Vector3) -> void:
     if dash_cooldown > 0.0 or stamina < 25.0:
@@ -82,4 +84,4 @@ func take_damage(amount: float) -> void:
 func _respawn() -> void:
     health = max_health
     stamina = max_stamina
-    global_position = Vector3(0,1,0)
+    global_position = Vector3(0,1,4)
