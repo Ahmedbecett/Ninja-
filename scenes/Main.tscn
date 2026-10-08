@@ -57,10 +57,8 @@ fog_light_energy=0.55
 fog_density=0.006
 glow_enabled=true
 glow_intensity=0.75
-ssr_enabled=true
-ssao_enabled=true
-ssao_radius=2.5
-ssao_intensity=1.5
+ssr_enabled=false
+ssao_enabled=false
 
 [sub_resource type="StandardMaterial3D" id="EnemyMarker"]
 albedo_color=Color(0.15,0.025,0.02,1)
