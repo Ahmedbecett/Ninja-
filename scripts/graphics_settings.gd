@@ -49,3 +49,6 @@ func load_settings() -> void:
 
 func get_label() -> String:
     return labels[level]
+
+func cycle() -> void:
+    set_level((level + 1) % labels.size())
