@@ -20,10 +20,10 @@ func _physics_process(delta: float) -> void:
     if not is_instance_valid(target):
         target = get_tree().get_first_node_in_group("player")
         return
-    var offset := target.global_position-global_position
-    var dist := offset.length()
+    var offset: Vector3 = target.global_position-global_position
+    var dist: float = offset.length()
     if dist > 2.6:
-        var dir := offset.normalized()
+        var dir: Vector3 = offset.normalized()
         velocity.x = dir.x * move_speed
         velocity.z = dir.z * move_speed
         rotation.y = lerp_angle(rotation.y,atan2(-dir.x,-dir.z),delta*4.0)
@@ -35,7 +35,7 @@ func _physics_process(delta: float) -> void:
             target.take_damage(26.0 if not enraged else 38.0)
     if special_timer <= 0.0:
         special_timer = 5.0
-        var player := target
+        var player: Node3D = target
         if is_instance_valid(player):
             player.take_damage(45.0)
     move_and_slide()
