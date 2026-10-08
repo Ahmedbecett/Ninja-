@@ -30,13 +30,13 @@ func _physics_process(delta: float) -> void:
     if not is_instance_valid(target):
         target = get_tree().get_first_node_in_group("player")
         return
-    var offset := target.global_position-global_position
-    var distance := offset.length()
+    var offset: Vector3 = target.global_position-global_position
+    var distance: float = offset.length()
     if distance > chase_range:
         velocity.x = move_toward(velocity.x,0,12*delta)
         velocity.z = move_toward(velocity.z,0,12*delta)
     elif distance > attack_range:
-        var dir := offset.normalized()
+        var dir: Vector3 = offset.normalized()
         velocity.x = dir.x*move_speed
         velocity.z = dir.z*move_speed
         rotation.y = lerp_angle(rotation.y,atan2(-dir.x,-dir.z),delta*7.0)
