@@ -108,6 +108,8 @@ func _complete_mission() -> void:
     notice = "MISSION COMPLETE  //  " + str(m.title)
     current_mission += 1
     mission_progress = 0
+    if current_mission < MISSIONS.size() and MISSIONS[current_mission].type == "boss" and boss_done:
+        _complete_mission()
     campaign_changed.emit()
 
 func _zone_position(zone:String) -> Vector3:
