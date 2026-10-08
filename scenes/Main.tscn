@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource path="res://scripts/main.gd" type="Script" id="1"]
 [ext_resource path="res://scripts/player.gd" type="Script" id="2"]
-[ext_resource path="res://scripts/enemy.gd" type="Script" id="3"]
-[ext_resource path="res://scripts/world.gd" type="Script" id="4"]
+[ext_resource path="res://scripts/enemy_ai.gd" type="Script" id="3"]
+[ext_resource path="res://scripts/world_generator.gd" type="Script" id="4"]
 [ext_resource path="res://scripts/hud.gd" type="Script" id="5"]
+[ext_resource path="res://scripts/mobile_controls.gd" type="Script" id="6"]
 
 [sub_resource type="CapsuleMesh" id="PlayerMesh"]
 radius = 0.45
@@ -25,6 +26,16 @@ albedo_color = Color(0.025,0.035,0.04,1)
 roughness = 0.92
 metallic = 0.05
 
+[sub_resource type="StandardMaterial3D" id="PlayerMaterial"]
+albedo_color = Color(0.035,0.04,0.05,1)
+metallic = 0.15
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="EnemyMaterial"]
+albedo_color = Color(0.18,0.035,0.025,1)
+metallic = 0.05
+roughness = 0.7
+
 [node name="NINJA" type="Node3D"]
 script = ExtResource("1")
 
@@ -42,11 +53,12 @@ material_override = SubResource("GroundMaterial")
 shape = SubResource("GroundShape")
 
 [node name="Player" type="CharacterBody3D" parent="."]
-position = Vector3(0,1,4)
+position = Vector3(0,1,5)
 script = ExtResource("2")
 
 [node name="Mesh" type="MeshInstance3D" parent="Player"]
 mesh = SubResource("PlayerMesh")
+material_override = SubResource("PlayerMaterial")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
 shape = SubResource("PlayerShape")
@@ -59,15 +71,41 @@ rotation_degrees = Vector3(-12,0,0)
 current = true
 fov = 70.0
 
-[node name="Enemy" type="CharacterBody3D" parent="."]
-position = Vector3(0,1,-8)
+[node name="Enemy01" type="CharacterBody3D" parent="."]
+position = Vector3(-3,1,-7)
 script = ExtResource("3")
 
-[node name="Mesh" type="MeshInstance3D" parent="Enemy"]
+[node name="Mesh" type="MeshInstance3D" parent="Enemy01"]
 mesh = SubResource("PlayerMesh")
+material_override = SubResource("EnemyMaterial")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy01"]
+shape = SubResource("PlayerShape")
+
+[node name="Enemy02" type="CharacterBody3D" parent="."]
+position = Vector3(5,1,-10)
+script = ExtResource("3")
+
+[node name="Mesh" type="MeshInstance3D" parent="Enemy02"]
+mesh = SubResource("PlayerMesh")
+material_override = SubResource("EnemyMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy02"]
+shape = SubResource("PlayerShape")
+
+[node name="Enemy03" type="CharacterBody3D" parent="."]
+position = Vector3(9,1,2)
+script = ExtResource("3")
+
+[node name="Mesh" type="MeshInstance3D" parent="Enemy03"]
+mesh = SubResource("PlayerMesh")
+material_override = SubResource("EnemyMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy03"]
 shape = SubResource("PlayerShape")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("5")
+
+[node name="MobileControls" type="CanvasLayer" parent="."]
+script = ExtResource("6")
