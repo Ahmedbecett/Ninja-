@@ -19,6 +19,7 @@ func _generate()->void:
     var rock_mat:=_mat(Color(0.055,0.065,0.075,1),0.95,0.05)
     var wood_mat:=_mat(Color(0.09,0.045,0.025,1),0.88,0.0)
     var roof_mat:=_mat(Color(0.035,0.02,0.025,1),0.9,0.0)
+    var trap_script=preload("res://scripts/spike_trap.gd")
     for i in range(65):
         var rock:=MeshInstance3D.new()
         var mesh:=SphereMesh.new()
@@ -32,6 +33,8 @@ func _generate()->void:
         add_child(rock)
     for i in range(24):
         _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
+    for i in range(12):
+        _make_trap(Vector3(rng.randf_range(-radius+3.0,radius-3.0),0.03,rng.randf_range(-radius+3.0,radius-3.0)),rng)
 
 func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     var tree:=Node3D.new()
@@ -61,3 +64,12 @@ func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     shape.position.y=1.6
     body.add_child(shape)
     add_child(body)
+
+
+func _make_trap(pos:Vector3,rng:RandomNumberGenerator)->void:
+    if pos.length() < 7.0:
+        pos += Vector3(8.0,0,8.0)
+    var trap:=Area3D.new()
+    trap.set_script(trap_script)
+    trap.position=pos
+    add_child(trap)

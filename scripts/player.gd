@@ -16,6 +16,7 @@ var mobile_move := Vector2.ZERO
 var combat: CombatSystem
 var visual: CharacterVisual
 var camera_controller: CameraController
+var shuriken_script = preload("res://scripts/shuriken.gd")
 
 func _ready() -> void:
     health = max_health
@@ -63,6 +64,8 @@ func _physics_process(delta: float) -> void:
         attack()
     if Input.is_action_just_pressed("dash"):
         dash(direction)
+    if Input.is_action_just_pressed("shuriken"):
+        throw_shuriken(direction)
 
     stamina = minf(max_stamina,stamina+delta*16.0)
     if visual:
@@ -82,6 +85,17 @@ func heavy_attack() -> void:
         stamina -= 18.0
         if visual:
             visual.animate_state(0,true)
+
+func throw_shuriken(direction: Vector3) -> void:
+    if stamina < 8.0:
+        return
+    if direction.length() < 0.05:
+        direction = -global_transform.basis.z
+    var projectile := Area3D.new()
+    projectile.set_script(shuriken_script)
+    get_parent().add_child(projectile)
+    projectile.launch(global_position + Vector3(0,1.35,0) + direction*0.65, direction, self)
+    stamina -= 8.0
 
 func dash(direction: Vector3) -> void:
     if dash_cooldown > 0.0 or stamina < 25.0:

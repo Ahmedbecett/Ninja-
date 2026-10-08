@@ -6,6 +6,7 @@ var knob: ColorRect
 var attack_button: Button
 var dodge_button: Button
 var heavy_button: Button
+var shuriken_button: Button
 var radius := 78.0
 var center := Vector2.ZERO
 var active_touch := -1
@@ -31,9 +32,11 @@ func _build() -> void:
     attack_button = _button("ATTACK",150)
     dodge_button = _button("DASH",110)
     heavy_button = _button("HEAVY",110)
+    shuriken_button = _button("SHURIKEN",110)
     attack_button.pressed.connect(_attack)
     dodge_button.pressed.connect(_dash)
     heavy_button.pressed.connect(_heavy)
+    shuriken_button.pressed.connect(_shuriken)
     _layout()
 
 func _button(label_text:String,size_px:int)->Button:
@@ -54,6 +57,7 @@ func _layout()->void:
     attack_button.position=Vector2(s.x-175,s.y-185)
     dodge_button.position=Vector2(s.x-300,s.y-105)
     heavy_button.position=Vector2(s.x-315,s.y-235)
+    shuriken_button.position=Vector2(s.x-175,s.y-345)
 
 func _on_pad_input(event:InputEvent)->void:
     if event is InputEventScreenTouch:
@@ -90,3 +94,7 @@ func _dash()->void:
 func _heavy()->void:
     var p:=get_tree().get_first_node_in_group("player")
     if is_instance_valid(p): p.heavy_attack()
+
+func _shuriken()->void:
+    var p:=get_tree().get_first_node_in_group("player")
+    if is_instance_valid(p) and p.has_method("throw_shuriken"): p.throw_shuriken(Vector3.ZERO)
