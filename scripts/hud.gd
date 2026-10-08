@@ -6,6 +6,7 @@ var status:Label
 var combat_status:Label
 var quest_label:Label
 var wave_label:Label
+var equipment_label:Label
 
 func _ready()->void:
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
@@ -23,6 +24,10 @@ func _ready()->void:
     quest_label.position=Vector2(32,150)
     quest_label.add_theme_font_size_override("font_size",15)
     add_child(quest_label)
+    equipment_label=Label.new()
+    equipment_label.position=Vector2(32,206)
+    equipment_label.add_theme_font_size_override("font_size",15)
+    add_child(equipment_label)
     wave_label=Label.new()
     wave_label.position=Vector2(32,178)
     wave_label.add_theme_font_size_override("font_size",15)
@@ -42,3 +47,4 @@ func _process(_delta:float)->void:
     combat_status.text="LEVEL %d   XP %d   COINS %d   KILLS %d   COMBO %d" % [GameState.level,GameState.xp,GameState.coins,GameState.kills,GameState.combo]
     quest_label.text="MISSION  //  "+QuestSystem.get_active_text()
     wave_label.text="HOSTILES  //  %d" % get_tree().get_nodes_in_group("enemies").size()
+    equipment_label.text="LOADOUT  //  SHURIKEN × 12   |   COINS %d" % GameState.coins
