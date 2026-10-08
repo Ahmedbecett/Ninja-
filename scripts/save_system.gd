@@ -12,7 +12,8 @@ func save_game() -> bool:
         "shurikens": GameState.shurikens,
         "skills": Progression.unlocked_skills,
         "skill_points": Progression.skill_points,
-        "quest": QuestSystem.get_save_data()
+        "quest": QuestSystem.get_save_data(),
+        "campaign": CampaignSystem.get_save_data()
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -43,6 +44,7 @@ func load_game() -> bool:
             if Progression.unlocked_skills.has(key):
                 Progression.unlocked_skills[key] = bool(skills[key])
     QuestSystem.load_save_data(parsed.get("quest",{}))
+    CampaignSystem.load_save_data(parsed.get("campaign",{}))
     return true
 
 func _notification(what: int) -> void:
