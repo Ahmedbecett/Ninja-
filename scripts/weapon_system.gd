@@ -49,6 +49,18 @@ func get_stamina_cost(base:float) -> float:
 func get_range() -> float:
     return float(get_current().range)
 
+func cycle_weapon() -> void:
+    _refresh_unlocks()
+    var ids:Array=WEAPONS.keys()
+    var start:int=ids.find(equipped)
+    for step in range(1,ids.size()+1):
+        var idx:int=(start+step)%ids.size()
+        var id:String=ids[idx]
+        if unlocked.get(id,false):
+            equipped=id
+            weapon_changed.emit()
+            return
+
 func get_name() -> String:
     return str(get_current().name)
 
