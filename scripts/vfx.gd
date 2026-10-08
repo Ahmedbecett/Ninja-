@@ -38,4 +38,4 @@ static func impact(parent: Node3D, origin: Vector3) -> void:
     parent.add_child(ring)
     var tw := parent.create_tween()
     tw.parallel().tween_property(ring,"scale",Vector3(4,4,4),0.18)
-        tw.tween_callback(ring.queue_free)
+    tw.tween_callback(ring.queue_free)
