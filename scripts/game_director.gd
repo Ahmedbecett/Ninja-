@@ -9,10 +9,16 @@ var enemy_script = preload("res://scripts/enemy_ai.gd")
 var archer_script = preload("res://scripts/shadow_archer.gd")
 var boss_script = preload("res://scripts/boss_ai.gd")
 var visual_script = preload("res://scripts/character_visual.gd")
+
 var spawn_points := [
-    Vector3(-10,1,-12), Vector3(10,1,-12), Vector3(-14,1,-2),
-    Vector3(14,1,3), Vector3(-8,1,12), Vector3(9,1,11),
-    Vector3(0,1,-16), Vector3(16,1,-8)
+    {"pos":Vector3(-8,1,-10),"zone":"village"},
+    {"pos":Vector3(-22,1,18),"zone":"bamboo"},
+    {"pos":Vector3(-4,1,5),"zone":"river"},
+    {"pos":Vector3(24,1,19),"zone":"dojo"},
+    {"pos":Vector3(-25,1,23),"zone":"castle"},
+    {"pos":Vector3(0,1,-20),"zone":"citadel"},
+    {"pos":Vector3(-17,1,14),"zone":"bamboo"},
+    {"pos":Vector3(18,1,18),"zone":"dojo"}
 ]
 
 func _process(delta: float) -> void:
@@ -41,7 +47,9 @@ func _spawn_enemy() -> void:
     visual.set("enemy",true)
     enemy.add_child(visual)
     var idx: int=(GameState.kills+wave+active_count())%spawn_points.size()
-    enemy.global_position=spawn_points[idx]
+    var spawn:Dictionary=spawn_points[idx]
+    enemy.global_position=spawn.pos
+    enemy.set("campaign_zone",spawn.zone)
     enemy.set("max_health",100.0+wave*12.0)
     if not use_archer:
         enemy.set("move_speed",2.5+minf(wave*0.08,1.4))
