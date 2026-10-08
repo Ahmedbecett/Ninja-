@@ -18,7 +18,7 @@ static func slash(parent: Node3D, origin: Vector3, color := Color(0.7,0.85,1.0,1
     parent.add_child(arc)
     var tw := parent.create_tween()
     tw.parallel().tween_property(arc,"scale",Vector3(1.8,1,1),0.12)
-        tw.tween_callback(arc.queue_free)
+    tw.tween_callback(arc.queue_free)
 
 static func impact(parent: Node3D, origin: Vector3) -> void:
     var ring := MeshInstance3D.new()
