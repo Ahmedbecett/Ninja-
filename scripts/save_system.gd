@@ -4,7 +4,7 @@ const SAVE_PATH := "user://ninja_save.json"
 
 func save_game() -> bool:
     var data := {
-        "version": 1,
+        "version": 2,
         "level": GameState.level,
         "xp": GameState.xp,
         "coins": GameState.coins,
@@ -13,7 +13,8 @@ func save_game() -> bool:
         "skills": Progression.unlocked_skills,
         "skill_points": Progression.skill_points,
         "quest": QuestSystem.get_save_data(),
-        "campaign": CampaignSystem.get_save_data()
+        "campaign": CampaignSystem.get_save_data(),
+        "weapons": WeaponSystem.get_save_data()
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -45,6 +46,7 @@ func load_game() -> bool:
                 Progression.unlocked_skills[key] = bool(skills[key])
     QuestSystem.load_save_data(parsed.get("quest",{}))
     CampaignSystem.load_save_data(parsed.get("campaign",{}))
+    WeaponSystem.load_save_data(parsed.get("weapons",{}))
     return true
 
 func _notification(what: int) -> void:
