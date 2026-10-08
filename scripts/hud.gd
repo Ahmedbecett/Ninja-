@@ -11,6 +11,7 @@ var coin_icon:TextureRect
 var shuriken_icon:TextureRect
 var boss_bar:ProgressBar
 var boss_label:Label
+var campaign_label:Label
 
 func _ready()->void:
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
@@ -53,6 +54,10 @@ func _ready()->void:
     boss_bar.show_percentage=false
     boss_bar.visible=false
     add_child(boss_bar)
+    campaign_label=Label.new()
+    campaign_label.position=Vector2(32,205)
+    campaign_label.add_theme_font_size_override("font_size",16)
+    add_child(campaign_label)
     boss_label=Label.new()
     boss_label.position=Vector2(390,56)
     boss_label.add_theme_font_size_override("font_size",14)
@@ -77,6 +82,8 @@ func _process(_delta:float)->void:
     combat_status.text="LEVEL %d   XP %d   COINS %d   KILLS %d   COMBO %d" % [GameState.level,GameState.xp,GameState.coins,GameState.kills,GameState.combo]
     quest_label.text="MISSION  //  "+QuestSystem.get_active_text()
     wave_label.text="HOSTILES  //  %d" % get_tree().get_nodes_in_group("enemies").size()
+    if is_instance_valid(CampaignSystem):
+        campaign_label.text="STAGE %d  //  %s\nMISSION  //  %s" % [CampaignSystem.current_level, CampaignSystem.get_level_name(), CampaignSystem.get_mission_text()]
     equipment_label.text="COINS %d    //    SHURIKEN %d" % [GameState.coins,GameState.shurikens]
     var boss:=get_tree().get_first_node_in_group("boss")
     if is_instance_valid(boss):
