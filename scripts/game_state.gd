@@ -6,6 +6,8 @@ var coins := 0
 var kills := 0
 var combo := 0
 var combo_timer := 0.0
+var shurikens := 12
+var story_progress := 0
 
 func _ready() -> void:
     add_to_group("game_state")
