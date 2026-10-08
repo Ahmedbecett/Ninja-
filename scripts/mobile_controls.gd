@@ -7,6 +7,7 @@ var attack_button: Button
 var dodge_button: Button
 var heavy_button: Button
 var shuriken_button: Button
+var graphics_button: Button
 var radius := 78.0
 var center := Vector2.ZERO
 var active_touch := -1
@@ -37,6 +38,8 @@ func _build() -> void:
     dodge_button.pressed.connect(_dash)
     heavy_button.pressed.connect(_heavy)
     shuriken_button.pressed.connect(_shuriken)
+    graphics_button=_button("GFX",82)
+    graphics_button.pressed.connect(_graphics)
     _layout()
 
 func _button(label_text:String,size_px:int)->Button:
@@ -58,6 +61,7 @@ func _layout()->void:
     dodge_button.position=Vector2(s.x-300,s.y-105)
     heavy_button.position=Vector2(s.x-315,s.y-235)
     shuriken_button.position=Vector2(s.x-175,s.y-345)
+    graphics_button.position=Vector2(s.x-285,s.y-345)
 
 func _on_pad_input(event:InputEvent)->void:
     if event is InputEventScreenTouch:
@@ -98,3 +102,7 @@ func _heavy()->void:
 func _shuriken()->void:
     var p:=get_tree().get_first_node_in_group("player")
     if is_instance_valid(p) and p.has_method("throw_shuriken"): p.throw_shuriken(Vector3.ZERO)
+
+func _graphics()->void:
+    GraphicsSettings.cycle()
+    graphics_button.text="GFX "+GraphicsSettings.get_label()
