@@ -11,19 +11,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Godot
+
+      - name: Setup Godot with Android export templates
         uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.4.1
           use-dotnet: false
+          include-templates: true
+
+      - name: Verify Godot and export templates
+        run: |
+          godot --version
+          test -f "$HOME/.local/share/godot/export_templates/4.4.1.stable/android_debug.apk"
+          test -f "$HOME/.local/share/godot/export_templates/4.4.1.stable/android_release.apk"
+
       - name: Validate project
         run: godot --headless --path . --editor --quit
+
       - name: Export Android
         run: |
           mkdir -p build
-          godot --headless --path . --export-release "Android" build/NINJA.apk
+          godot --headless --path . --export-debug "Android" build/NINJA.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: NINJA-Android
           path: build/NINJA.apk
+          if-no-files-found: error
