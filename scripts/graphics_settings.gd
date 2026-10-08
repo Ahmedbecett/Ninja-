@@ -1,7 +1,7 @@
 extends Node
 class_name GraphicsSettings
 
-enum Level { LOW, MEDIUM, HIGH, ULTRA, 4K }
+enum Level { LOW, MEDIUM, HIGH, ULTRA, K4 }
 
 const SAVE_PATH := "user://graphics.cfg"
 var level: int = Level.HIGH
@@ -12,7 +12,7 @@ func _ready() -> void:
     apply()
 
 func set_level(value: int) -> void:
-    level = clamp(value, Level.LOW, Level.4K)
+    level = clamp(value, Level.LOW, Level.K4)
     apply()
     save_settings()
 
@@ -32,7 +32,7 @@ func apply() -> void:
             Level.ULTRA:
                 viewport.scaling_3d_scale = 1.0
                 Engine.max_fps = 60
-            Level.4K:
+            Level.K4:
                 viewport.scaling_3d_scale = 1.0
                 Engine.max_fps = 60
         RenderingServer.set_default_clear_color(Color(0.006,0.008,0.012))
