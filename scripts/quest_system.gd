@@ -1,5 +1,4 @@
 extends Node
-class_name QuestSystem
 
 var active_id := "first_blood"
 var progress := 0
