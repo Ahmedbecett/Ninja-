@@ -98,6 +98,31 @@ func _build() -> void:
     grip.height = 0.32
     _mesh(sword, grip, cloth, Vector3(0,0.16,0))
 
+    # High-detail silhouette: layered shoulder armor, scarf, hair and boots.
+    var shoulder_mesh := SphereMesh.new()
+    shoulder_mesh.radius = 0.22
+    shoulder_mesh.height = 0.30
+    _mesh(self, shoulder_mesh, armor, Vector3(-0.43,1.66,0), Vector3(1.15,0.65,0.95))
+    _mesh(self, shoulder_mesh, armor, Vector3(0.43,1.66,0), Vector3(1.15,0.65,0.95))
+
+    var scarf_mesh := BoxMesh.new()
+    scarf_mesh.size = Vector3(0.12,0.58,0.72)
+    _mesh(self, scarf_mesh, cloth, Vector3(0,1.72,0.34), Vector3(1.0,1.0,1.0))
+
+    var hair_mesh := SphereMesh.new()
+    hair_mesh.radius = 0.31
+    hair_mesh.height = 0.35
+    _mesh(head, hair_mesh, cloth, Vector3(0,2.27,0.02), Vector3(1.0,0.72,0.92))
+
+    var boot_mesh := BoxMesh.new()
+    boot_mesh.size = Vector3(0.25,0.18,0.48)
+    _mesh(left_leg, boot_mesh, cloth, Vector3(0,-0.84,-0.09))
+    _mesh(right_leg, boot_mesh, cloth, Vector3(0,-0.84,-0.09))
+
+    var sheath := BoxMesh.new()
+    sheath.size = Vector3(0.07,1.0,0.10)
+    _mesh(self, sheath, cloth, Vector3(-0.50,1.05,0.12), Vector3(1.0,1.0,1.0))
+
     var belt := MeshInstance3D.new()
     var belt_mesh := TorusMesh.new()
     belt_mesh.inner_radius = 0.34
