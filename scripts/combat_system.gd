@@ -26,8 +26,8 @@ func try_attack(owner: Node3D, heavy := false) -> bool:
     for enemy in owner.get_tree().get_nodes_in_group("enemies"):
         if not is_instance_valid(enemy):
             continue
-        var offset := enemy.global_position - owner.global_position
-        var distance := offset.length()
+        var offset: Vector3 = enemy.global_position - owner.global_position
+        var distance: float = offset.length()
         if distance > attack_distance:
             continue
         var forward := -owner.global_transform.basis.z
