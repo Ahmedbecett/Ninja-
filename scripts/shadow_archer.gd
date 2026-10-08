@@ -4,6 +4,7 @@ class_name ShadowArcher
 @export var max_health:=80.0
 @export var move_speed:=2.2
 @export var attack_range:=11.0
+@export var campaign_zone:="village"
 var health:=80.0
 var target:Node3D
 var attack_timer:=2.0
@@ -46,4 +47,5 @@ func take_damage(amount:float,source:Vector3=Vector3.ZERO)->void:
     if health<=0.0:
         GameState.register_kill()
         QuestSystem.register_kill(false)
+        CampaignSystem.register_zone_kill(campaign_zone)
         queue_free()
