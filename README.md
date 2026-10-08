@@ -1,30 +1,20 @@
-# NINJA
+# NINJA — Real Game Production Status
 
-A serious third-person 3D ninja action game built with Godot 4.4.1 for Android and desktop testing.
+NINJA is being developed as a real third-person 3D action game, not a static mockup.
 
-## Current gameplay foundation
+Current systems:
+- Third-person movement and touch camera
+- Light/heavy sword combat and combo timing
+- Dash, stamina and invulnerability
+- Throwable shuriken
+- Enemy pursuit, attacks, stagger and scaling
+- Dynamic enemy director and Shadow Commander boss
+- XP, levels, coins, kills and combo progression
+- Persistent save/load and quests
+- Procedural forest/rock terrain
+- Feudal village with houses, lanterns, shrine gate, bridge and paths
+- Dynamic day/night atmosphere and rain
+- Mobile HUD and equipment icons
+- Android CI/export pipeline
 
-- Third-person camera with touch swipe rotation.
-- Mobile virtual joystick with real movement input.
-- Light/heavy sword attacks and 3-step combo system.
-- Dash with stamina cost and temporary invulnerability.
-- Enemy AI with chase, attack, stagger and scaling difficulty.
-- Dynamic enemy director that keeps encounters active.
-- Shadow Commander boss encounter after progression milestones.
-- Procedural night environment with rocks, trees, fog, lighting and collision.
-- Character visuals built from modular 3D parts instead of placeholder capsules.
-- Hit flashes and combat impact effects.
-- XP, levels, coins, kills and combo tracking.
-- Mission progression with rewards and skill points.
-- Persistent save/load using user:// storage.
-- Android export workflow with Godot 4.4.1 export templates.
-
-## Build
-
-The repository includes a GitHub Actions Android pipeline that validates the Godot project and exports a debug APK.
-
-Godot's Android export requires installed export templates; Google Play distribution later requires a signed release build/AAB. See the official Godot Android export documentation.
-
-## Direction
-
-The project is being developed as a real game foundation, not a static mockup. The next production layers are content expansion, authored animation/assets, weapons, bosses, missions, progression depth, audio, optimization and release packaging.
+Next production layer: properly licensed imported 3D models, PBR materials, animation clips, richer level geometry and final Android optimization.
