@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource path="res://scripts/main.gd" type="Script" id="1"]
 [ext_resource path="res://scripts/player.gd" type="Script" id="2"]
@@ -6,106 +6,135 @@
 [ext_resource path="res://scripts/world_generator.gd" type="Script" id="4"]
 [ext_resource path="res://scripts/hud.gd" type="Script" id="5"]
 [ext_resource path="res://scripts/mobile_controls.gd" type="Script" id="6"]
-
-[sub_resource type="CapsuleMesh" id="PlayerMesh"]
-radius = 0.45
-height = 1.8
+[ext_resource path="res://scripts/character_visual.gd" type="Script" id="7"]
+[ext_resource path="res://scripts/camera_controller.gd" type="Script" id="8"]
+[ext_resource path="res://scripts/game_director.gd" type="Script" id="9"]
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
-radius = 0.42
-height = 1.8
+radius=0.42
+height=1.8
+
+[sub_resource type="CapsuleShape3D" id="EnemyShape"]
+radius=0.42
+height=1.8
 
 [sub_resource type="BoxShape3D" id="GroundShape"]
-size = Vector3(80, 0.2, 80)
+size=Vector3(80,0.2,80)
 
 [sub_resource type="PlaneMesh" id="GroundMesh"]
-size = Vector2(80, 80)
+size=Vector2(80,80)
 
 [sub_resource type="StandardMaterial3D" id="GroundMaterial"]
-albedo_color = Color(0.025,0.035,0.04,1)
-roughness = 0.92
-metallic = 0.05
+albedo_color=Color(0.018,0.025,0.03,1)
+roughness=0.94
+metallic=0.04
 
-[sub_resource type="StandardMaterial3D" id="PlayerMaterial"]
-albedo_color = Color(0.035,0.04,0.05,1)
-metallic = 0.15
-roughness = 0.5
+[sub_resource type="Environment" id="Environment"]
+background_mode=1
+background_color=Color(0.004,0.007,0.014,1)
+ambient_light_source=3
+ambient_light_color=Color(0.12,0.16,0.22,1)
+ambient_light_energy=0.62
+fog_enabled=true
+fog_light_color=Color(0.07,0.09,0.13,1)
+fog_light_energy=0.45
+fog_density=0.008
+glow_enabled=true
+glow_intensity=0.8
 
-[sub_resource type="StandardMaterial3D" id="EnemyMaterial"]
-albedo_color = Color(0.18,0.035,0.025,1)
-metallic = 0.05
-roughness = 0.7
+[sub_resource type="StandardMaterial3D" id="EnemyMarker"]
+albedo_color=Color(0.15,0.025,0.02,1)
+emission_enabled=true
+emission=Color(0.35,0.01,0.005,1)
+emission_energy_multiplier=2.0
 
 [node name="NINJA" type="Node3D"]
-script = ExtResource("1")
+script=ExtResource("1")
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment=SubResource("Environment")
+
+[node name="MoonLight" type="DirectionalLight3D" parent="."]
+rotation_degrees=Vector3(-52,-28,0)
+light_color=Color(0.55,0.65,0.9,1)
+light_energy=0.72
+shadow_enabled=true
+directional_shadow_max_distance=45.0
+
+[node name="RimLight" type="DirectionalLight3D" parent="."]
+rotation_degrees=Vector3(-25,145,0)
+light_color=Color(0.9,0.2,0.12,1)
+light_energy=0.28
+shadow_enabled=false
 
 [node name="World" type="Node3D" parent="."]
-script = ExtResource("4")
+script=ExtResource("4")
 
 [node name="Ground" type="StaticBody3D" parent="World"]
-position = Vector3(0,-0.1,0)
+position=Vector3(0,-0.1,0)
 
 [node name="Mesh" type="MeshInstance3D" parent="World/Ground"]
-mesh = SubResource("GroundMesh")
-material_override = SubResource("GroundMaterial")
+mesh=SubResource("GroundMesh")
+material_override=SubResource("GroundMaterial")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World/Ground"]
-shape = SubResource("GroundShape")
+shape=SubResource("GroundShape")
 
 [node name="Player" type="CharacterBody3D" parent="."]
-position = Vector3(0,1,5)
-script = ExtResource("2")
+position=Vector3(0,1,5)
+script=ExtResource("2")
 
-[node name="Mesh" type="MeshInstance3D" parent="Player"]
-mesh = SubResource("PlayerMesh")
-material_override = SubResource("PlayerMaterial")
+[node name="Visual" type="Node3D" parent="Player"]
+script=ExtResource("7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-shape = SubResource("PlayerShape")
+shape=SubResource("PlayerShape")
 
 [node name="CameraRig" type="Node3D" parent="Player"]
-position = Vector3(0,2.8,6.5)
-rotation_degrees = Vector3(-12,0,0)
+script=ExtResource("8")
 
 [node name="Camera3D" type="Camera3D" parent="Player/CameraRig"]
-current = true
-fov = 70.0
+current=true
+fov=68.0
 
 [node name="Enemy01" type="CharacterBody3D" parent="."]
-position = Vector3(-3,1,-7)
-script = ExtResource("3")
+position=Vector3(-3,1,-7)
+script=ExtResource("3")
 
-[node name="Mesh" type="MeshInstance3D" parent="Enemy01"]
-mesh = SubResource("PlayerMesh")
-material_override = SubResource("EnemyMaterial")
+[node name="Visual" type="Node3D" parent="Enemy01"]
+script=ExtResource("7")
+enemy=true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy01"]
-shape = SubResource("PlayerShape")
+shape=SubResource("EnemyShape")
 
 [node name="Enemy02" type="CharacterBody3D" parent="."]
-position = Vector3(5,1,-10)
-script = ExtResource("3")
+position=Vector3(5,1,-10)
+script=ExtResource("3")
 
-[node name="Mesh" type="MeshInstance3D" parent="Enemy02"]
-mesh = SubResource("PlayerMesh")
-material_override = SubResource("EnemyMaterial")
+[node name="Visual" type="Node3D" parent="Enemy02"]
+script=ExtResource("7")
+enemy=true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy02"]
-shape = SubResource("PlayerShape")
+shape=SubResource("EnemyShape")
 
 [node name="Enemy03" type="CharacterBody3D" parent="."]
-position = Vector3(9,1,2)
-script = ExtResource("3")
+position=Vector3(9,1,2)
+script=ExtResource("3")
 
-[node name="Mesh" type="MeshInstance3D" parent="Enemy03"]
-mesh = SubResource("PlayerMesh")
-material_override = SubResource("EnemyMaterial")
+[node name="Visual" type="Node3D" parent="Enemy03"]
+script=ExtResource("7")
+enemy=true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy03"]
-shape = SubResource("PlayerShape")
+shape=SubResource("EnemyShape")
+
+[node name="GameDirector" type="Node3D" parent="."]
+script=ExtResource("9")
 
 [node name="HUD" type="CanvasLayer" parent="."]
-script = ExtResource("5")
+script=ExtResource("5")
 
 [node name="MobileControls" type="CanvasLayer" parent="."]
-script = ExtResource("6")
+script=ExtResource("6")
