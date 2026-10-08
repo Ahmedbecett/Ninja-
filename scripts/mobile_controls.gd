@@ -45,7 +45,7 @@ func _button(label_text:String,size_px:int)->Button:
     return b
 
 func _layout()->void:
-    var s:=get_viewport().size
+    var s = Vector2(get_viewport().size)
     move_pad.position=Vector2(28,s.y-210)
     move_pad.size=Vector2(170,170)
     center=Vector2(85,85)
