@@ -23,7 +23,6 @@ func _ready() -> void:
     var material := StandardMaterial3D.new()
     material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    material.albedo_texture = load("res://assets/world/spike_trap_icon.png")
     material.albedo_color = Color(1,1,1,0.92)
     mesh.material_override = material
     add_child(mesh)
