@@ -48,5 +48,6 @@ func take_damage(amount: float, source: Vector3 = Vector3.ZERO) -> void:
     if health <= 0.0:
         GameState.register_kill()
         QuestSystem.register_kill(true)
+        CampaignSystem.register_boss_defeated()
         GameState.add_xp(250)
         queue_free()
