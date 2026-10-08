@@ -38,7 +38,7 @@ func _build() -> void:
     dodge_button.pressed.connect(_dash)
     heavy_button.pressed.connect(_heavy)
     shuriken_button.pressed.connect(_shuriken)
-    graphics_button=_button("GFX",82)
+    graphics_button=_button("GFX "+GraphicsSettings.get_label(),82)
     graphics_button.pressed.connect(_graphics)
     _layout()
 
