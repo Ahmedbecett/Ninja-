@@ -7,6 +7,10 @@ var combat_status:Label
 var quest_label:Label
 var wave_label:Label
 var equipment_label:Label
+var coin_icon:TextureRect
+var shuriken_icon:TextureRect
+var boss_bar:ProgressBar
+var boss_label:Label
 
 func _ready()->void:
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
@@ -24,10 +28,36 @@ func _ready()->void:
     quest_label.position=Vector2(32,150)
     quest_label.add_theme_font_size_override("font_size",15)
     add_child(quest_label)
+    coin_icon=TextureRect.new()
+    coin_icon.texture=load("res://assets/ui/coin_icon.png")
+    coin_icon.position=Vector2(338,201)
+    coin_icon.size=Vector2(28,28)
+    coin_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+    coin_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    add_child(coin_icon)
+    shuriken_icon=TextureRect.new()
+    shuriken_icon.texture=load("res://assets/ui/shuriken_icon.png")
+    shuriken_icon.position=Vector2(338,235)
+    shuriken_icon.size=Vector2(28,28)
+    shuriken_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+    shuriken_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    add_child(shuriken_icon)
     equipment_label=Label.new()
-    equipment_label.position=Vector2(32,206)
+    equipment_label.position=Vector2(372,198)
     equipment_label.add_theme_font_size_override("font_size",15)
     add_child(equipment_label)
+    boss_bar=ProgressBar.new()
+    boss_bar.position=Vector2(390,32)
+    boss_bar.size=Vector2(500,20)
+    boss_bar.max_value=650.0
+    boss_bar.show_percentage=false
+    boss_bar.visible=false
+    add_child(boss_bar)
+    boss_label=Label.new()
+    boss_label.position=Vector2(390,56)
+    boss_label.add_theme_font_size_override("font_size",14)
+    boss_label.visible=false
+    add_child(boss_label)
     wave_label=Label.new()
     wave_label.position=Vector2(32,178)
     wave_label.add_theme_font_size_override("font_size",15)
@@ -47,4 +77,14 @@ func _process(_delta:float)->void:
     combat_status.text="LEVEL %d   XP %d   COINS %d   KILLS %d   COMBO %d" % [GameState.level,GameState.xp,GameState.coins,GameState.kills,GameState.combo]
     quest_label.text="MISSION  //  "+QuestSystem.get_active_text()
     wave_label.text="HOSTILES  //  %d" % get_tree().get_nodes_in_group("enemies").size()
-    equipment_label.text="LOADOUT  //  SHURIKEN × 12   |   COINS %d" % GameState.coins
+    equipment_label.text="COINS %d    //    SHURIKEN 12" % GameState.coins
+    var boss:=get_tree().get_first_node_in_group("boss")
+    if is_instance_valid(boss):
+        boss_bar.visible=true
+        boss_label.visible=true
+        boss_bar.max_value=boss.max_health
+        boss_bar.value=boss.health
+        boss_label.text="SHADOW COMMANDER  //  %d HP" % int(boss.health)
+    else:
+        boss_bar.visible=false
+        boss_label.visible=false
