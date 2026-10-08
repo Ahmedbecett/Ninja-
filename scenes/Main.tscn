@@ -11,6 +11,7 @@
 [ext_resource path="res://scripts/game_director.gd" type="Script" id="9"]
 [ext_resource path="res://scripts/atmosphere.gd" type="Script" id="10"]
 [ext_resource path="res://scripts/visual_quality.gd" type="Script" id="11"]
+[ext_resource path="res://scripts/grass_asset_integration.gd" type="Script" id="12"]
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius=0.42
@@ -93,6 +94,11 @@ script=ExtResource("4")
 
 [node name="VisualQuality" type="Node3D" parent="World"]
 script=ExtResource("11")
+
+[node name="RealGrass" type="Node3D" parent="World"]
+script=ExtResource("12")
+instance_count=72
+world_radius=34.0
 
 [node name="Ground" type="StaticBody3D" parent="World"]
 position=Vector3(0,-0.1,0)
