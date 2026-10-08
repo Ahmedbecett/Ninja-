@@ -9,6 +9,7 @@ func save_game() -> bool:
         "xp": GameState.xp,
         "coins": GameState.coins,
         "kills": GameState.kills,
+        "shurikens": GameState.shurikens,
         "skills": Progression.unlocked_skills,
         "skill_points": Progression.skill_points,
         "quest": QuestSystem.get_save_data()
@@ -34,6 +35,7 @@ func load_game() -> bool:
     GameState.xp = int(parsed.get("xp",0))
     GameState.coins = int(parsed.get("coins",0))
     GameState.kills = int(parsed.get("kills",0))
+    GameState.shurikens = int(parsed.get("shurikens",12))
     Progression.skill_points = int(parsed.get("skill_points",0))
     var skills = parsed.get("skills",{})
     if skills is Dictionary:

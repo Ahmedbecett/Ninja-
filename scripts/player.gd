@@ -87,7 +87,7 @@ func heavy_attack() -> void:
             visual.animate_state(0,true)
 
 func throw_shuriken(direction: Vector3) -> void:
-    if stamina < 8.0:
+    if stamina < 8.0 or GameState.shurikens <= 0:
         return
     if direction.length() < 0.05:
         direction = -global_transform.basis.z
@@ -96,6 +96,7 @@ func throw_shuriken(direction: Vector3) -> void:
     get_parent().add_child(projectile)
     projectile.launch(global_position + Vector3(0,1.35,0) + direction*0.65, direction, self)
     stamina -= 8.0
+    GameState.shurikens -= 1
 
 func dash(direction: Vector3) -> void:
     if dash_cooldown > 0.0 or stamina < 25.0:

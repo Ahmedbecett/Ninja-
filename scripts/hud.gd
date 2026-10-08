@@ -77,7 +77,7 @@ func _process(_delta:float)->void:
     combat_status.text="LEVEL %d   XP %d   COINS %d   KILLS %d   COMBO %d" % [GameState.level,GameState.xp,GameState.coins,GameState.kills,GameState.combo]
     quest_label.text="MISSION  //  "+QuestSystem.get_active_text()
     wave_label.text="HOSTILES  //  %d" % get_tree().get_nodes_in_group("enemies").size()
-    equipment_label.text="COINS %d    //    SHURIKEN 12" % GameState.coins
+    equipment_label.text="COINS %d    //    SHURIKEN %d" % [GameState.coins,GameState.shurikens]
     var boss:=get_tree().get_first_node_in_group("boss")
     if is_instance_valid(boss):
         boss_bar.visible=true

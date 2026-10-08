@@ -6,6 +6,7 @@ var wave := 1
 var spawn_timer := 2.0
 var boss_spawned := false
 var enemy_script = preload("res://scripts/enemy_ai.gd")
+var archer_script = preload("res://scripts/shadow_archer.gd")
 var boss_script = preload("res://scripts/boss_ai.gd")
 var visual_script = preload("res://scripts/character_visual.gd")
 var spawn_points := [
@@ -26,7 +27,8 @@ func _process(delta: float) -> void:
 
 func _spawn_enemy() -> void:
     var enemy:=CharacterBody3D.new()
-    enemy.set_script(enemy_script)
+    var use_archer:bool = wave >= 2 and (GameState.kills + wave) % 4 == 0
+    enemy.set_script(archer_script if use_archer else enemy_script)
     get_parent().add_child(enemy)
     var shape:=CollisionShape3D.new()
     var capsule:=CapsuleShape3D.new()
@@ -41,7 +43,8 @@ func _spawn_enemy() -> void:
     var idx: int=(GameState.kills+wave+active_count())%spawn_points.size()
     enemy.global_position=spawn_points[idx]
     enemy.set("max_health",100.0+wave*12.0)
-    enemy.set("move_speed",2.5+minf(wave*0.08,1.4))
+    if not use_archer:
+        enemy.set("move_speed",2.5+minf(wave*0.08,1.4))
     wave=1+int(GameState.kills/5)
 
 func active_count()->int:
