@@ -8,6 +8,9 @@ var kills := 0
 var combo := 0
 var combo_timer := 0.0
 
+func _ready() -> void:
+    add_to_group("game_state")
+
 func add_xp(amount: int) -> void:
     xp += amount
     while xp >= level * 100:
@@ -16,6 +19,9 @@ func add_xp(amount: int) -> void:
 
 func register_kill() -> void:
     kills += 1
+    coins += 10
+    combo += 1
+    combo_timer = 3.0
     add_xp(25)
 
 func _process(delta: float) -> void:
