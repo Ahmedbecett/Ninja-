@@ -1,5 +1,4 @@
 extends Node
-class_name Progression
 
 var unlocked_skills := {
     "double_dash": false,
