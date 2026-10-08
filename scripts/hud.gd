@@ -14,6 +14,7 @@ var boss_label:Label
 var campaign_label:Label
 var weapon_label:Label
 var reward_label:Label
+var weapon_button:Button
 
 func _ready()->void:
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
@@ -64,6 +65,12 @@ func _ready()->void:
     weapon_label.position=Vector2(32,260)
     weapon_label.add_theme_font_size_override("font_size",15)
     add_child(weapon_label)
+    weapon_button=Button.new()
+    weapon_button.text="SWAP WEAPON"
+    weapon_button.position=Vector2(32,308)
+    weapon_button.size=Vector2(160,38)
+    weapon_button.pressed.connect(_swap_weapon)
+    add_child(weapon_button)
     reward_label=Label.new()
     reward_label.position=Vector2(32,282)
     reward_label.add_theme_font_size_override("font_size",14)
@@ -109,3 +116,11 @@ func _process(_delta:float)->void:
     else:
         boss_bar.visible=false
         boss_label.visible=false
+
+func _swap_weapon() -> void:
+    WeaponSystem.cycle_weapon()
+    var p:=get_tree().get_first_node_in_group("player")
+    if is_instance_valid(p):
+        var v=p.get_node_or_null("Visual")
+        if v and v.has_method("_apply_weapon_visual"):
+            v._apply_weapon_visual()
