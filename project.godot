@@ -12,6 +12,7 @@ GameState="*res://scripts/game_state.gd"
 Progression="*res://scripts/progression.gd"
 SaveSystem="*res://scripts/save_system.gd"
 QuestSystem="*res://scripts/quest_system.gd"
+CampaignSystem="*res://scripts/campaign_system.gd"
 
 [display]
 window/size/viewport_width=1280
