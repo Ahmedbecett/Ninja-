@@ -16,7 +16,7 @@ var spawn_points := [
 
 func _process(delta: float) -> void:
     spawn_timer=maxf(spawn_timer-delta,0.0)
-    var active:=get_tree().get_nodes_in_group("enemies").size()
+    var active: int = get_tree().get_nodes_in_group("enemies").size()
     if GameState.kills>=15 and not boss_spawned:
         _spawn_boss()
         boss_spawned=true
