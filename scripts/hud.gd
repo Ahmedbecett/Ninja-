@@ -36,7 +36,7 @@ func _ready()->void:
     coin_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
     add_child(coin_icon)
     shuriken_icon=TextureRect.new()
-    shuriken_icon.texture=load("res://assets/ui/shuriken_icon.png")
+    shuriken_icon.texture=load("res://assets/ui/shuriken_icon.svg")
     shuriken_icon.position=Vector2(338,235)
     shuriken_icon.size=Vector2(28,28)
     shuriken_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
