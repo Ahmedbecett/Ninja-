@@ -12,6 +12,8 @@ var shuriken_icon:TextureRect
 var boss_bar:ProgressBar
 var boss_label:Label
 var campaign_label:Label
+var weapon_label:Label
+var reward_label:Label
 
 func _ready()->void:
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
@@ -58,6 +60,14 @@ func _ready()->void:
     campaign_label.position=Vector2(32,205)
     campaign_label.add_theme_font_size_override("font_size",16)
     add_child(campaign_label)
+    weapon_label=Label.new()
+    weapon_label.position=Vector2(32,260)
+    weapon_label.add_theme_font_size_override("font_size",15)
+    add_child(weapon_label)
+    reward_label=Label.new()
+    reward_label.position=Vector2(32,282)
+    reward_label.add_theme_font_size_override("font_size",14)
+    add_child(reward_label)
     boss_label=Label.new()
     boss_label.position=Vector2(390,56)
     boss_label.add_theme_font_size_override("font_size",14)
@@ -84,7 +94,11 @@ func _process(_delta:float)->void:
     wave_label.text="HOSTILES  //  %d" % get_tree().get_nodes_in_group("enemies").size()
     if is_instance_valid(CampaignSystem):
         campaign_label.text="STAGE %d  //  %s\nMISSION  //  %s" % [CampaignSystem.current_level, CampaignSystem.get_level_name(), CampaignSystem.get_mission_text()]
-    equipment_label.text="COINS %d    //    SHURIKEN %d" % [GameState.coins,GameState.shurikens]
+    equipment_label.text="COINS %d    //    SHURIKEN %d    //    SKILL POINTS %d" % [GameState.coins,GameState.shurikens,Progression.skill_points]
+    weapon_label.text="WEAPON  //  %s" % WeaponSystem.get_name()
+    reward_label.text="GRAPHICS  //  %s" % GraphicsSettings.get_label()
+    if CampaignSystem.notice != "":
+        reward_label.text += "    //    " + CampaignSystem.notice
     var boss:=get_tree().get_first_node_in_group("boss")
     if is_instance_valid(boss):
         boss_bar.visible=true
