@@ -7,6 +7,7 @@ class_name EnemyAI
 @export var attack_range := 1.85
 @export var attack_damage := 14.0
 @export var xp_reward := 25
+@export var campaign_zone := "village"
 
 var health := 120.0
 var target: Node3D
@@ -62,4 +63,5 @@ func take_damage(amount: float, source: Vector3 = Vector3.ZERO) -> void:
     if health <= 0.0:
         GameState.register_kill()
         QuestSystem.register_kill(false)
+        CampaignSystem.register_zone_kill(campaign_zone)
         queue_free()
