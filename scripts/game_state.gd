@@ -1,5 +1,4 @@
 extends Node
-class_name GameState
 
 var level := 1
 var xp := 0
