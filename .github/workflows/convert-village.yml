@@ -2,6 +2,9 @@ name: Convert Medieval Village to GLB
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/convert-village.yml'
 
 permissions:
   contents: read
