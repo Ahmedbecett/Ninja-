@@ -3,6 +3,7 @@ extends CanvasLayer
 var health_bar: ProgressBar
 var stamina_bar: ProgressBar
 var status: Label
+var combat_status: Label
 
 func _ready() -> void:
     health_bar = ProgressBar.new()
@@ -19,12 +20,20 @@ func _ready() -> void:
 
     status = Label.new()
     status.position = Vector2(32,92)
-    status.text = "NINJA // FOUNDATION"
+    status.text = "NINJA // SHADOW PROTOCOL"
     status.add_theme_font_size_override("font_size",18)
     add_child(status)
+
+    combat_status = Label.new()
+    combat_status.position = Vector2(32,122)
+    combat_status.add_theme_font_size_override("font_size",16)
+    add_child(combat_status)
 
 func _process(_delta: float) -> void:
     var player := get_tree().get_first_node_in_group("player")
     if is_instance_valid(player):
         health_bar.value = player.health
         stamina_bar.value = player.stamina
+    var state := get_tree().get_first_node_in_group("game_state")
+    if state:
+        combat_status.text = "LEVEL %d   XP %d   KILLS %d   COMBO %d" % [state.level, state.xp, state.kills, state.combo]
