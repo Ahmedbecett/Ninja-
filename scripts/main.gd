@@ -25,3 +25,10 @@ func _build_environment() -> void:
     sun.light_energy = 1.15
     sun.shadow_enabled = true
     add_child(sun)
+
+    var moon := OmniLight3D.new()
+    moon.position = Vector3(0,8,0)
+    moon.light_color = Color("#6f7fb5")
+    moon.light_energy = 1.8
+    moon.omni_range = 35.0
+    add_child(moon)
