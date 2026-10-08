@@ -10,6 +10,7 @@
 [ext_resource path="res://scripts/camera_controller.gd" type="Script" id="8"]
 [ext_resource path="res://scripts/game_director.gd" type="Script" id="9"]
 [ext_resource path="res://scripts/atmosphere.gd" type="Script" id="10"]
+[ext_resource path="res://scripts/visual_quality.gd" type="Script" id="11"]
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius=0.42
@@ -30,18 +31,34 @@ albedo_color=Color(0.018,0.025,0.03,1)
 roughness=0.94
 metallic=0.04
 
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial"]
+sky_top_color=Color(0.008,0.018,0.045,1)
+sky_horizon_color=Color(0.22,0.12,0.10,1)
+ground_bottom_color=Color(0.006,0.008,0.012,1)
+ground_horizon_color=Color(0.07,0.045,0.04,1)
+sun_angle_max=18.0
+sun_curve=0.08
+
+[sub_resource type="Sky" id="Sky"]
+sky_material=SubResource("SkyMaterial")
+
 [sub_resource type="Environment" id="Environment"]
-background_mode=1
-background_color=Color(0.004,0.007,0.014,1)
+background_mode=2
+sky=SubResource("Sky")
 ambient_light_source=3
-ambient_light_color=Color(0.12,0.16,0.22,1)
-ambient_light_energy=0.62
+ambient_light_color=Color(0.20,0.22,0.28,1)
+ambient_light_energy=0.78
+reflected_light_source=2
 fog_enabled=true
-fog_light_color=Color(0.07,0.09,0.13,1)
-fog_light_energy=0.45
-fog_density=0.008
+fog_light_color=Color(0.09,0.105,0.14,1)
+fog_light_energy=0.55
+fog_density=0.006
 glow_enabled=true
-glow_intensity=0.8
+glow_intensity=0.75
+ssr_enabled=true
+ssao_enabled=true
+ssao_radius=2.5
+ssao_intensity=1.5
 
 [sub_resource type="StandardMaterial3D" id="EnemyMarker"]
 albedo_color=Color(0.15,0.025,0.02,1)
@@ -73,6 +90,9 @@ script=ExtResource("10")
 
 [node name="World" type="Node3D" parent="."]
 script=ExtResource("4")
+
+[node name="VisualQuality" type="Node3D" parent="World"]
+script=ExtResource("11")
 
 [node name="Ground" type="StaticBody3D" parent="World"]
 position=Vector3(0,-0.1,0)
