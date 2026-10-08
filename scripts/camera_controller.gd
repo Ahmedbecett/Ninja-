@@ -20,7 +20,7 @@ func _unhandled_input(event: InputEvent) -> void:
         dragging = event.pressed
         last_touch = event.position
     elif event is InputEventScreenDrag and dragging:
-        var delta := event.relative
+        var delta: Vector2 = event.relative
         yaw -= delta.x * sensitivity
         pitch = clampf(pitch - delta.y * sensitivity, -0.65, 0.2)
     elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
