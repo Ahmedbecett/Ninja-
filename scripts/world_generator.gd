@@ -191,55 +191,10 @@ func _make_bamboo_grove()->void:
             _make_box(self,Vector3(x,h*0.5,z),Vector3(0.18,h,0.18),green)
 
 func _make_trap(pos:Vector3,rng:RandomNumberGenerator)->void:
-    var trap_script = preload("res://scripts/spike_trap.gd")
-    if pos.length() < 7.0:
-        pos += Vector3(8.0,0,8.0)
+    var trap_script=preload("res://scripts/spike_trap.gd")
+    if pos.length()<7.0:
+        pos+=Vector3(8.0,0,8.0)
     var trap:=Area3D.new()
     trap.set_script(trap_script)
     trap.position=pos
     add_child(trap)
-
-func _make_dojo(pos:Vector3)->void:
-    var wood:=_mat(Color(0.13,0.06,0.028,1),0.82)
-    var dark:=_mat(Color(0.025,0.018,0.014,1),0.88)
-    for x in [-4.0,4.0]:
-        _make_box(self,pos+Vector3(x,2.0,0),Vector3(0.35,4.0,7.0),wood)
-    _make_box(self,pos+Vector3(0,3.8,0),Vector3(8.6,0.45,7.4),dark)
-    _make_box(self,pos+Vector3(0,1.5,-3.5),Vector3(7.8,3.0,0.3),wood)
-    _make_box(self,pos+Vector3(0,1.5,3.5),Vector3(7.8,3.0,0.3),wood)
-    for x in [-2.8,0,2.8]:
-        _make_lantern(pos+Vector3(x,0,-4.2))
-    var body:=StaticBody3D.new()
-    body.position=pos
-    var shape:=CollisionShape3D.new()
-    var box:=BoxShape3D.new()
-    box.size=Vector3(8.2,3.8,7.0)
-    shape.shape=box
-    shape.position.y=1.9
-    body.add_child(shape)
-    add_child(body)
-
-func _make_castle_gate(pos:Vector3)->void:
-    var stone:=_mat(Color(0.09,0.095,0.105,1),0.94)
-    var wood:=_mat(Color(0.18,0.035,0.02,1),0.75)
-    _make_box(self,pos+Vector3(-5,3,0),Vector3(2.2,6,3.2),stone)
-    _make_box(self,pos+Vector3(5,3,0),Vector3(2.2,6,3.2),stone)
-    _make_box(self,pos+Vector3(0,6,0),Vector3(12,2.2,3.2),stone)
-    _make_box(self,pos+Vector3(0,2.8,-1.7),Vector3(6.0,4.6,0.35),wood)
-    _make_torii(pos+Vector3(0,0,-2.4))
-
-func _make_river()->void:
-    var water:=_mat(Color(0.015,0.07,0.11,1),0.12,0.25)
-    water.emission_enabled=true
-    water.emission=Color(0.0,0.025,0.05,1)
-    water.emission_energy_multiplier=0.35
-    _make_box(self,Vector3(0,-0.03,3.0),Vector3(80,0.08,5.2),water)
-    for x in range(-36,37,4):
-        _make_box(self,Vector3(x,0.04,0.5),Vector3(2.5,0.03,0.25),_mat(Color(0.15,0.17,0.18,1),0.92))
-
-func _make_bamboo_grove()->void:
-    var green:=_mat(Color(0.035,0.16,0.07,1),0.86)
-    for x in range(-28,-10,3):
-        for z in range(10,28,3):
-            var h:=4.0+abs(sin(float(x*z)))*3.0
-            _make_box(self,Vector3(x, h*0.5,z),Vector3(0.18,h,0.18),green)
