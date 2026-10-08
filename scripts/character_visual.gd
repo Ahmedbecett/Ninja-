@@ -133,6 +133,26 @@ func _build() -> void:
     belt.material_override = accent
     belt.position.y = 1.02
     add_child(belt)
+    if not enemy:
+        _apply_weapon_visual()
+
+func _apply_weapon_visual() -> void:
+    if not is_instance_valid(sword):
+        return
+    var data:Dictionary = WeaponSystem.get_current()
+    var id:=WeaponSystem.equipped
+    var length_scale:=1.0 + (float(data.range)-2.8)*0.7
+    sword.scale=Vector3(1.0,length_scale,1.0)
+    var blade_mesh:=sword.get_child(0) as MeshInstance3D
+    if blade_mesh:
+        var blade_mat:=_mat(Color(0.32,0.36,0.4,1),0.92,0.2)
+        if id=="ASH_KATANA":
+            blade_mat=_mat(Color(0.42,0.18,0.12,1),0.94,0.16)
+        elif id=="SHADOW_BLADE":
+            blade_mat=_mat(Color(0.08,0.11,0.15,1),0.98,0.10)
+        elif id=="CITADEL_RELIC":
+            blade_mat=_mat(Color(0.55,0.45,0.25,1),0.96,0.12)
+        blade_mesh.material_override=blade_mat
 
 func animate_state(speed: float, attacking: bool) -> void:
     phase += speed * 0.08
