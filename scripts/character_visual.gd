@@ -125,7 +125,7 @@ func animate_state(speed: float, attacking: bool) -> void:
 func hit_flash() -> void:
     for child in get_children():
         if child is MeshInstance3D:
-            var old := child.material_override
+            var old: Material = child.material_override
             var flash := _mat(Color(1.0,0.65,0.4,1), 0.2, 0.25)
             child.material_override = flash
             var tw := create_tween()
