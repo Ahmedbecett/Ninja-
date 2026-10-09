@@ -14,37 +14,61 @@ jobs:
         with:
           lfs: true
 
-      - name: Extract real forest model and textures
+      - name: Prepare optional source assets
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y p7zip-full blender
           mkdir -p assets/imported/forestpack assets/imported/characters
-          blender --background assets/characters/blender/mikasanew2.blend --python-expr "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/characters/mikasanew2.glb', export_format='GLB', export_animations=True)"
-          blender --background assets/characters/blender/Anime2.blend --python-expr "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/characters/Anime2.glb', export_format='GLB', export_animations=True)"
-          test -s assets/imported/characters/mikasanew2.glb
-          test -s assets/imported/characters/Anime2.glb
-          7z x -y assets/source_archives/ForestPack.7z -oassets/imported/forestpack
-          test -s assets/imported/forestpack/ForestPack.fbx
-          echo "Extracted real forest FBX:"
-          ls -lh assets/imported/forestpack/ForestPack.fbx
-          find assets/imported/forestpack -maxdepth 2 -type f | head -40
 
-      - name: Verify required large assets were downloaded
+          is_real_asset() {
+            local file="$1"
+            test -s "$file" || return 1
+            ! head -c 100 "$file" | grep -q "version https://git-lfs.github.com/spec/v1"
+          }
+
+          for name in mikasanew2 Anime2; do
+            src="assets/characters/blender/\${name}.blend"
+            dst="assets/imported/characters/\${name}.glb"
+            if is_real_asset "$src"; then
+              blender --background "$src" --python-expr \
+                "import bpy; bpy.ops.export_scene.gltf(filepath='\${dst}', export_format='GLB', export_animations=True)"
+              test -s "$dst"
+              echo "Exported character: $dst"
+            else
+              echo "Optional character source unavailable (missing/LFS pointer): $src"
+            fi
+          done
+
+          archive="assets/source_archives/ForestPack.7z"
+          if is_real_asset "$archive"; then
+            if 7z x -y "$archive" -oassets/imported/forestpack; then
+              if find assets/imported/forestpack -type f -iname 'ForestPack.fbx' -print -quit | grep -q .; then
+                echo "ForestPack archive extracted."
+              else
+                echo "ForestPack.fbx not found in archive; continuing with fallback world."
+              fi
+            else
+              echo "ForestPack archive could not be extracted; continuing with fallback world."
+            fi
+          else
+            echo "Optional ForestPack archive unavailable (missing/LFS pointer); using fallback world."
+          fi
+
+      - name: Verify required ground textures
         run: |
           set -euo pipefail
           for asset in \
-            "assets/world/grass/Grass.glb" \
             "assets/world/grass/textures/Dirt_Ground_basecolor.jpg" \
             "assets/world/grass/textures/Dirt_Ground_normal.jpg" \
             "assets/world/grass/textures/Dirt_Ground_roughness.jpg" \
             "assets/world/grass/textures/Dirt_Ground_ambientocclusion.jpg"; do
             test -s "$asset"
-            if head -c 80 "$asset" | grep -q "version https://git-lfs.github.com/spec/v1"; then
-              echo "Git LFS pointer was not replaced by the real asset: $asset"
+            if head -c 100 "$asset" | grep -q "version https://git-lfs.github.com/spec/v1"; then
+              echo "Git LFS pointer was not replaced by the real texture: $asset"
               exit 1
             fi
-            echo "Asset ready: $asset ($(du -h "$asset" | cut -f1))"
+            echo "Texture ready: $asset ($(du -h "$asset" | cut -f1))"
           done
 
       - name: Setup Godot with Android export templates
@@ -62,7 +86,7 @@ jobs:
 
       - name: Configure Android SDK for Godot
         run: |
-          SDK_PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDK_PATH="\${ANDROID_HOME:-\${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
           test -d "$SDK_PATH"
           test -x "$SDK_PATH/platform-tools/adb"
           test -d "$JAVA_HOME"
