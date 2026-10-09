@@ -40,7 +40,7 @@ jobs:
           abc_source="assets/world/source/japanfuji.abc"
           if is_real_asset "$abc_source"; then
             blender --background --python-expr \
-              "import bpy; bpy.ops.wm.alembic_import(filepath='\${abc_source}'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True)"
+              "import bpy; bpy.ops.wm.alembic_import(filepath='${abc_source}'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True)"
             test -s assets/imported/world/japanfuji.glb
             echo "Converted japanfuji.abc to assets/imported/world/japanfuji.glb"
           else
@@ -48,11 +48,11 @@ jobs:
           fi
 
           for name in mikasanew2 Anime2; do
-            src="assets/characters/blender/\${name}.blend"
-            dst="assets/imported/characters/\${name}.glb"
+            src="assets/characters/blender/${name}.blend"
+            dst="assets/imported/characters/${name}.glb"
             if is_real_asset "$src"; then
               blender --background "$src" --python-expr \
-                "import bpy; bpy.ops.export_scene.gltf(filepath='\${dst}', export_format='GLB', export_animations=True)"
+                "import bpy; bpy.ops.export_scene.gltf(filepath='${dst}', export_format='GLB', export_animations=True)"
               test -s "$dst"
               echo "Exported character: $dst"
             else
@@ -151,7 +151,7 @@ jobs:
 
       - name: Configure Android SDK for Godot
         run: |
-          SDK_PATH="\${ANDROID_HOME:-\${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDK_PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
           test -d "$SDK_PATH"
           test -x "$SDK_PATH/platform-tools/adb"
           test -d "$JAVA_HOME"
