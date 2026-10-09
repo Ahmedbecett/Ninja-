@@ -13,6 +13,7 @@ var center := Vector2.ZERO
 var active_touch := -1
 
 func _ready() -> void:
+    add_to_group("mobile_controls")
     _build()
     get_viewport().size_changed.connect(_layout)
 
