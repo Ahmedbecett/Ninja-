@@ -19,6 +19,7 @@
 [ext_resource path="res://assets/world/grass/textures/Dirt_Ground_ambientocclusion.jpg" type="Texture2D" id="17"]
 [ext_resource path="res://scripts/cinematic_intro.gd" type="Script" id="18"]
 [ext_resource path="res://scripts/imported_environment.gd" type="Script" id="19"]
+[ext_resource path="res://scripts/world_source_assets.gd" type="Script" id="20"]
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius=0.42
@@ -106,6 +107,9 @@ script=ExtResource("4")
 
 [node name="VisualQuality" type="Node3D" parent="World"]
 script=ExtResource("11")
+
+[node name="WorldSourceAssets" type="Node3D" parent="World"]
+script=ExtResource("20")
 
 [node name="ImportedForest" type="Node3D" parent="World"]
 script=ExtResource("19")
