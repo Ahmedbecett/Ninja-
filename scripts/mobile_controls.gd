@@ -68,7 +68,7 @@ func _on_pad_input(event:InputEvent)->void:
     if event is InputEventScreenTouch:
         active_touch=event.index if event.pressed else -1
         if not event.pressed:
-            _set_move(Vector2.ZERO)
+            _release_move()
         else:
             _set_move(event.position-move_pad.global_position)
     elif event is InputEventScreenDrag and event.index==active_touch:
