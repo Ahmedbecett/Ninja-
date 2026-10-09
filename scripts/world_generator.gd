@@ -19,9 +19,10 @@ func _generate()->void:
     var rock_mat:=_mat(Color(0.055,0.065,0.075,1),0.95,0.05)
     var wood_mat:=_mat(Color(0.09,0.045,0.025,1),0.88,0.0)
     var roof_mat:=_mat(Color(0.035,0.02,0.025,1),0.9,0.0)
-    # Use the imported ForestPack geometry when available. Primitive rocks and
-    # cone/sphere trees are retained only as an offline fallback for editing.
-    var has_real_forest := ResourceLoader.exists("res://assets/imported/forestpack/ForestPack.fbx")
+    # Only suppress placeholder trees and rocks after the imported forest has
+    # actually instantiated. File existence alone does not prove the FBX loaded.
+    var forest_loader := get_node_or_null("ImportedForest") as ImportedEnvironment
+    var has_real_forest := forest_loader != null and is_instance_valid(forest_loader.loaded_environment)
     if not has_real_forest:
         for i in range(65):
             var rock:=MeshInstance3D.new()
