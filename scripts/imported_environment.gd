@@ -9,7 +9,7 @@ class_name ImportedEnvironment
 var loaded_environment: Node3D
 
 func _ready() -> void:
-    call_deferred("_load_environment")
+    _load_environment()
 
 func _load_environment() -> void:
     if not ResourceLoader.exists(environment_scene_path):
