@@ -221,19 +221,19 @@ dst = os.path.abspath('assets/imported/world/japanfuji.glb')
 operator = getattr(getattr(bpy.ops, 'wm', None), 'alembic_import', None)
 if operator is None or not operator.poll():
     print('Alembic importer is unavailable in this Blender build; keeping procedural Fuji fallback.')
-    sys.exit(0)
-try:
-    result = operator(filepath=src)
-    if 'FINISHED' not in result:
-        raise RuntimeError('Alembic import did not finish')
-    bpy.ops.export_scene.gltf(filepath=dst, export_format='GLB', export_apply=True)
-    if not os.path.isfile(dst) or os.path.getsize(dst) == 0:
-        raise RuntimeError('Fuji GLB export was empty')
-    print('Mount Fuji model exported successfully.')
-except Exception as exc:
-    print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
-    if os.path.exists(dst):
-        os.remove(dst)
+else:
+    try:
+        result = operator(filepath=src)
+        if 'FINISHED' not in result:
+            raise RuntimeError('Alembic import did not finish')
+        bpy.ops.export_scene.gltf(filepath=dst, export_format='GLB', export_apply=True)
+        if not os.path.isfile(dst) or os.path.getsize(dst) == 0:
+            raise RuntimeError('Fuji GLB export was empty')
+        print('Mount Fuji model exported successfully.')
+    except Exception as exc:
+        print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
+        if os.path.exists(dst):
+            os.remove(dst)
 "
           else
             echo "japanfuji.abc is unavailable as a real LFS asset; the procedural Fuji fallback remains active."
