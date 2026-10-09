@@ -19,19 +19,23 @@ func _generate()->void:
     var rock_mat:=_mat(Color(0.055,0.065,0.075,1),0.95,0.05)
     var wood_mat:=_mat(Color(0.09,0.045,0.025,1),0.88,0.0)
     var roof_mat:=_mat(Color(0.035,0.02,0.025,1),0.9,0.0)
-    for i in range(65):
-        var rock:=MeshInstance3D.new()
-        var mesh:=SphereMesh.new()
-        var s:=rng.randf_range(0.25,1.45)
-        mesh.radius=s
-        mesh.height=s*1.6
-        rock.mesh=mesh
-        rock.material_override=rock_mat
-        rock.position=Vector3(rng.randf_range(-radius,radius),s*0.45,rng.randf_range(-radius,radius))
-        rock.scale=Vector3(1,rng.randf_range(0.5,1.35),1)
-        add_child(rock)
-    for i in range(24):
-        _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
+    # Use the imported ForestPack geometry when available. Primitive rocks and
+    # cone/sphere trees are retained only as an offline fallback for editing.
+    var has_real_forest := ResourceLoader.exists("res://assets/imported/forestpack/ForestPack.fbx")
+    if not has_real_forest:
+        for i in range(65):
+            var rock:=MeshInstance3D.new()
+            var mesh:=SphereMesh.new()
+            var s:=rng.randf_range(0.25,1.45)
+            mesh.radius=s
+            mesh.height=s*1.6
+            rock.mesh=mesh
+            rock.material_override=rock_mat
+            rock.position=Vector3(rng.randf_range(-radius,radius),s*0.45,rng.randf_range(-radius,radius))
+            rock.scale=Vector3(1,rng.randf_range(0.5,1.35),1)
+            add_child(rock)
+        for i in range(24):
+            _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
     _make_village(wood_mat,roof_mat)
     _make_dojo(Vector3(23,0,21))
     _make_castle_gate(Vector3(-22,0,21))
