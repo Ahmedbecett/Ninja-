@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  prepare-assets:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and download Git LFS assets
@@ -31,16 +31,6 @@ jobs:
             test -s "$file" || return 1
             ! head -c 100 "$file" | grep -q "version https://git-lfs.github.com/spec/v1"
           }
-
-          blend_source="assets/world/source/22.blend"
-          if is_real_asset "$blend_source"; then
-            blender --background "$blend_source" --python-expr \
-              "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/world/world_22.glb', export_format='GLB', export_apply=True)"
-            test -s assets/imported/world/world_22.glb
-            echo "Converted 22.blend to assets/imported/world/world_22.glb"
-          else
-            echo "22.blend source not present as a real binary; runtime will use the detailed procedural world."
-          fi
 
           abc_source="assets/world/source/japanfuji.abc"
           if is_real_asset "$abc_source"; then
@@ -124,6 +114,111 @@ jobs:
             rm -f assets/world/grass/Grass.glb
             echo "Removed invalid LFS pointer for Grass.glb from build workspace; procedural vegetation remains enabled."
           fi
+
+      - name: Upload prepared resources for Android build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ninja-prepared-resources
+          path: |
+            assets/imported/**
+            assets/world/grass/textures/**
+          if-no-files-found: ignore
+          retention-days: 2
+
+  prepare-main-world:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and download Git LFS assets
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Blender and export the main 3D world
+        timeout-minutes: 25
+        env:
+          OMP_NUM_THREADS: "2"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "2"
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          mkdir -p assets/imported/world
+          src="assets/world/source/22.blend"
+          if test -s "$src" && ! head -c 100 "$src" | grep -q "version https://git-lfs.github.com/spec/v1"; then
+            blender --background --threads 2 "$src" --python-expr "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/world/world_22.glb', export_format='GLB', export_apply=True)"
+            test -s assets/imported/world/world_22.glb
+            echo "Main 3D world exported successfully."
+          else
+            echo "22.blend is unavailable as a real LFS asset; the game will use its procedural fallback."
+          fi
+
+      - name: Upload main world model
+        if: success() && hashFiles('assets/imported/world/world_22.glb') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ninja-main-world
+          path: assets/imported/world/world_22.glb
+          if-no-files-found: error
+          retention-days: 2
+
+  build:
+    if: always()
+    needs: [prepare-assets, prepare-main-world]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and download Git LFS assets
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Download prepared game resources when available
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: ninja-*
+          path: .
+          merge-multiple: true
+
+      - name: Generate safe build textures if source files are Git LFS pointers
+        run: |
+          set -euo pipefail
+          python3 -m pip --version >/dev/null 2>&1 || true
+          sudo apt-get update
+          sudo apt-get install -y python3-pil
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import hashlib, random
+          root = Path("assets/world/grass/textures")
+          root.mkdir(parents=True, exist_ok=True)
+          for path in root.glob("*"):
+              if not path.is_file():
+                  continue
+              raw = path.read_bytes()
+              if not raw.startswith(b"version https://git-lfs.github.com/spec/v1"):
+                  continue
+              seed = int(hashlib.sha256(path.name.encode()).hexdigest()[:8], 16)
+              rng = random.Random(seed)
+              name = path.name.lower()
+              pixels = []
+              for _ in range(256 * 256):
+                  n = rng.randint(-18, 18)
+                  if "normal" in name:
+                      rgb = (max(0,min(255,128+n)), max(0,min(255,128+n)), max(0,min(255,245+n//3)))
+                  elif any(k in name for k in ("roughness","ambientocclusion","metallic")):
+                      base = 55 if "metallic" in name else (205 if "roughness" in name else 225)
+                      v = max(0,min(255,base+n)); rgb = (v,v,v)
+                  elif any(k in name for k in ("leaf","grass","dandelion","stem","branch","nettle","leave","redcurrant")):
+                      rgb = (max(0,min(255,38+n)), max(0,min(255,95+n*2)), max(0,min(255,32+n)))
+                  else:
+                      rgb = (max(0,min(255,92+n)), max(0,min(255,75+n)), max(0,min(255,48+n)))
+                  pixels.append(rgb)
+              image = Image.new("RGB", (256,256)); image.putdata(pixels)
+              image.save(path, format="PNG" if path.suffix.lower()==".png" else "JPEG", optimize=True)
+              print("Generated fallback texture:", path)
+          PY
 
       - name: Verify ground textures
         run: |
