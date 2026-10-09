@@ -21,6 +21,8 @@ var _skip: Button
 var _top_bar: ColorRect
 var _bottom_bar: ColorRect
 var _initial_yaw := 0.0
+var _paused_enemies: Array[Node] = []
+var _director: Node
 
 func _ready() -> void:
     layer = 100
@@ -32,6 +34,13 @@ func _ready() -> void:
     _hud = get_tree().get_first_node_in_group("game_hud") as CanvasLayer
     _mobile = get_tree().get_first_node_in_group("mobile_controls") as CanvasLayer
     _player.set_physics_process(false)
+    _director = get_tree().current_scene.get_node_or_null("GameDirector")
+    if _director:
+        _director.set_process(false)
+    for enemy in get_tree().get_nodes_in_group("enemies"):
+        if enemy is Node:
+            _paused_enemies.append(enemy)
+            enemy.set_physics_process(false)
     if _hud:
         _hud.visible = false
     if _mobile:
@@ -173,6 +182,11 @@ func _finish() -> void:
     if _player and is_instance_valid(_player):
         _player.set_physics_process(true)
         _player.rotation.y = 0.0
+    if _director and is_instance_valid(_director):
+        _director.set_process(true)
+    for enemy in _paused_enemies:
+        if is_instance_valid(enemy):
+            enemy.set_physics_process(true)
     if _camera_rig:
         _camera_rig.set("distance", 6.2)
         _camera_rig.set("height", 2.7)
