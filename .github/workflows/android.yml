@@ -177,9 +177,16 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          pattern: ninja-*
-          path: .
+          pattern: ninja-prepared-resources
+          path: assets
           merge-multiple: true
+
+      - name: Download converted main world when available
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: ninja-main-world
+          path: assets/imported/world
 
       - name: Generate safe build textures if source files are Git LFS pointers
         run: |
