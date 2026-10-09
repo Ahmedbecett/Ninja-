@@ -26,17 +26,8 @@ func _generate()->void:
     var has_imported_world := source_assets != null and source_assets.has_primary_world()
     var has_real_forest := has_imported_world or (forest_loader != null and is_instance_valid(forest_loader.loaded_environment))
     if not has_real_forest:
-        for i in range(65):
-            var rock:=MeshInstance3D.new()
-            var mesh:=SphereMesh.new()
-            var s:=rng.randf_range(0.25,1.45)
-            mesh.radius=s
-            mesh.height=s*1.6
-            rock.mesh=mesh
-            rock.material_override=rock_mat
-            rock.position=Vector3(rng.randf_range(-radius,radius),s*0.45,rng.randf_range(-radius,radius))
-            rock.scale=Vector3(1,rng.randf_range(0.5,1.35),1)
-            add_child(rock)
+        # Trees are only a safety fallback. Imported forest/world assets always
+        # take precedence so the final scene is not mixed with primitive trees.
         for i in range(24):
             _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
     # Imported 3D world takes priority over the block-built prototype.
@@ -47,8 +38,9 @@ func _generate()->void:
         _make_castle_gate(Vector3(-22,0,21))
         _make_river()
         _make_bamboo_grove()
-    for i in range(12):
-        _make_trap(Vector3(rng.randf_range(-radius+3.0,radius-3.0),0.03,rng.randf_range(-radius+3.0,radius-3.0)),rng)
+    if not has_imported_world:
+        for i in range(12):
+            _make_trap(Vector3(rng.randf_range(-radius+3.0,radius-3.0),0.03,rng.randf_range(-radius+3.0,radius-3.0)),rng)
 
 func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     var tree:=Node3D.new()

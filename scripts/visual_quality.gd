@@ -4,7 +4,9 @@ class_name VisualQuality
 @export var radius := 38.0
 
 func _ready() -> void:
-    _build_terrain_details()
+    # Wait until sibling asset loaders finish before deciding whether fallback
+    # geometry is needed; never cover a successfully imported realistic scene.
+    call_deferred("_build_terrain_details")
 
 func _mat(color: Color, rough := 0.9, metal := 0.0) -> StandardMaterial3D:
     var m := StandardMaterial3D.new()
@@ -54,6 +56,15 @@ func _grass_blade(pos: Vector3, height: float, width: float, mat: Material, yaw:
     add_child(blade)
 
 func _build_terrain_details() -> void:
+    var world_root := get_parent()
+    var source_assets := world_root.get_node_or_null("WorldSourceAssets") as WorldSourceAssets
+    var forest_loader := world_root.get_node_or_null("ImportedForest") as ImportedEnvironment
+    var has_real_world := source_assets != null and source_assets.has_primary_world()
+    var has_real_forest := forest_loader != null and is_instance_valid(forest_loader.loaded_environment)
+    if has_real_world or has_real_forest:
+        print("NINJA: Real imported world/forest detected; skipping synthetic grass, rocks, and soil overlays.")
+        return
+
     var rng := RandomNumberGenerator.new()
     rng.seed = 448211
     var grass := _mat(Color(0.025,0.095,0.045,1),0.98)

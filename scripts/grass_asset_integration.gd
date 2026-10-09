@@ -15,6 +15,12 @@ func _ready() -> void:
     call_deferred("_load_and_place")
 
 func _load_and_place() -> void:
+    var world_root := get_parent()
+    var source_assets := world_root.get_node_or_null("WorldSourceAssets") as WorldSourceAssets
+    if source_assets != null and source_assets.has_primary_world():
+        print("NINJA: Main imported world already contains the scene vegetation; skipping duplicate Grass.glb instances.")
+        return
+
     if not ResourceLoader.exists(grass_scene_path) or _is_lfs_pointer(grass_scene_path):
         push_warning("NINJA: Grass.glb is missing or is only a Git LFS pointer; keeping procedural vegetation active.")
         return
