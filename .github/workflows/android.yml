@@ -14,6 +14,18 @@ jobs:
         with:
           lfs: true
 
+      - name: Extract real forest model and textures
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+          mkdir -p assets/imported/forestpack
+          7z x -y assets/source_archives/ForestPack.7z -oassets/imported/forestpack
+          test -s assets/imported/forestpack/ForestPack.fbx
+          echo "Extracted real forest FBX:"
+          ls -lh assets/imported/forestpack/ForestPack.fbx
+          find assets/imported/forestpack -maxdepth 2 -type f | head -40
+
       - name: Verify required large assets were downloaded
         run: |
           set -euo pipefail
