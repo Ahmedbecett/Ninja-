@@ -23,6 +23,36 @@ func _box(parent: Node3D, pos: Vector3, size: Vector3, mat: Material) -> MeshIns
     parent.add_child(n)
     return n
 
+func _is_real_asset(path: String) -> bool:
+    if not ResourceLoader.exists(path):
+        return false
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return false
+    var header := file.get_buffer(80).get_string_from_utf8()
+    file.close()
+    return not header.begins_with("version https://git-lfs.github.com/spec/v1")
+
+func _grass_blade(pos: Vector3, height: float, width: float, mat: Material, yaw: float) -> void:
+    var st := SurfaceTool.new()
+    st.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var left := Vector3(-width * 0.5, 0.0, 0.0)
+    var right := Vector3(width * 0.5, 0.0, 0.0)
+    var tip := Vector3(0.0, height, 0.0)
+    st.add_vertex(left)
+    st.add_vertex(tip)
+    st.add_vertex(right)
+    st.add_vertex(right)
+    st.add_vertex(tip)
+    st.add_vertex(left)
+    st.generate_normals()
+    var blade := MeshInstance3D.new()
+    blade.mesh = st.commit()
+    blade.material_override = mat
+    blade.position = pos
+    blade.rotation.y = yaw
+    add_child(blade)
+
 func _build_terrain_details() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = 448211
@@ -30,24 +60,37 @@ func _build_terrain_details() -> void:
     var grass2 := _mat(Color(0.055,0.14,0.065,1),0.98)
     var stone := _mat(Color(0.13,0.14,0.145,1),0.92)
     var soil := _mat(Color(0.095,0.065,0.045,1),1.0)
-    var real_grass_available := ResourceLoader.exists("res://assets/world/grass/Grass.glb")
-    # Avoid drawing hundreds of box-shaped blades on top of the real vegetation asset.
+    var real_grass_available := _is_real_asset("res://assets/world/grass/Grass.glb")
     if not real_grass_available:
-        for i in range(180):
+        for i in range(260):
             var p := Vector3(rng.randf_range(-radius,radius),0.0,rng.randf_range(-radius,radius))
             if abs(p.z-3.0) < 3.6:
                 continue
-            var blade := _box(self,p+Vector3(0,rng.randf_range(0.08,0.18),0),Vector3(rng.randf_range(0.025,0.055),rng.randf_range(0.16,0.34),rng.randf_range(0.025,0.055)),grass if i%2==0 else grass2)
-            blade.rotation.y = rng.randf_range(0.0,6.28)
-            blade.rotation.z = rng.randf_range(-0.18,0.18)
+            var height := rng.randf_range(0.18,0.42)
+            var width := rng.randf_range(0.07,0.14)
+            var mat := grass if i % 2 == 0 else grass2
+            _grass_blade(p, height, width, mat, rng.randf_range(0.0,TAU))
+            if i % 3 == 0:
+                _grass_blade(p + Vector3(0.04,0.0,0.035), height * 0.82, width * 0.8, grass2 if mat == grass else grass, rng.randf_range(0.0,TAU))
 
-    for i in range(55):
-        var p := Vector3(rng.randf_range(-radius,radius),0.03,rng.randf_range(-radius,radius))
+    for i in range(65):
+        var p := Vector3(rng.randf_range(-radius,radius),0.02,rng.randf_range(-radius,radius))
         if abs(p.z-3.0) < 4.0:
             continue
-        var stone_n := _box(self,p,Vector3(rng.randf_range(0.18,0.7),rng.randf_range(0.08,0.35),rng.randf_range(0.18,0.55)),stone)
-        stone_n.rotation = Vector3(rng.randf_range(-0.2,0.2),rng.randf_range(0,6.28),rng.randf_range(-0.2,0.2))
+        var rock_mesh := SphereMesh.new()
+        rock_mesh.radius = rng.randf_range(0.18,0.55)
+        rock_mesh.height = rock_mesh.radius * rng.randf_range(0.55,1.2)
+        rock_mesh.radial_segments = 7
+        rock_mesh.rings = 5
+        var rock_n := MeshInstance3D.new()
+        rock_n.mesh = rock_mesh
+        rock_n.material_override = stone
+        rock_n.position = p
+        rock_n.scale = Vector3(rng.randf_range(0.8,1.4),rng.randf_range(0.65,1.0),rng.randf_range(0.8,1.35))
+        rock_n.rotation.y = rng.randf_range(0.0,TAU)
+        add_child(rock_n)
+
     for i in range(28):
         var p := Vector3(rng.randf_range(-34,34),0.025,rng.randf_range(-34,34))
         var patch := _box(self,p,Vector3(rng.randf_range(1.2,3.2),0.035,rng.randf_range(0.8,2.2)),soil)
-        patch.rotation.y = rng.randf_range(0,6.28)
+        patch.rotation.y = rng.randf_range(0,TAU)
