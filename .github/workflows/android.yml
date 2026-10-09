@@ -212,9 +212,29 @@ jobs:
           mkdir -p assets/imported/world
           src="assets/world/source/japanfuji.abc"
           if test -s "$src" && ! head -c 100 "$src" | grep -q "version https://git-lfs.github.com/spec/v1"; then
-            blender --background --threads 2 --python-expr "import bpy; bpy.ops.wm.alembic_import(filepath='assets/world/source/japanfuji.abc'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True)"
-            test -s assets/imported/world/japanfuji.glb
-            echo "Mount Fuji model exported successfully."
+            # Some Ubuntu Blender builds are compiled without the Alembic importer.
+            # Detect that before invoking it, so an optional Fuji source cannot fail the APK build.
+            blender --background --threads 2 --python-expr "
+import bpy, os, sys
+src = os.path.abspath('assets/world/source/japanfuji.abc')
+dst = os.path.abspath('assets/imported/world/japanfuji.glb')
+operator = getattr(getattr(bpy.ops, 'wm', None), 'alembic_import', None)
+if operator is None or not operator.poll():
+    print('Alembic importer is unavailable in this Blender build; keeping procedural Fuji fallback.')
+    sys.exit(0)
+try:
+    result = operator(filepath=src)
+    if 'FINISHED' not in result:
+        raise RuntimeError('Alembic import did not finish')
+    bpy.ops.export_scene.gltf(filepath=dst, export_format='GLB', export_apply=True)
+    if not os.path.isfile(dst) or os.path.getsize(dst) == 0:
+        raise RuntimeError('Fuji GLB export was empty')
+    print('Mount Fuji model exported successfully.')
+except Exception as exc:
+    print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
+    if os.path.exists(dst):
+        os.remove(dst)
+"
           else
             echo "japanfuji.abc is unavailable as a real LFS asset; the procedural Fuji fallback remains active."
           fi
