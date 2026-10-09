@@ -159,7 +159,7 @@ jobs:
           test -d "$SDK_PATH"
           test -x "$SDK_PATH/platform-tools/adb"
           test -d "$JAVA_HOME"
-          mkdir -p "$HOME/.config/godot" build
+          mkdir -p "$HOME/.config/godot" "$HOME/.android" build
           # Godot needs a valid debug keystore for Android APK export.
           keytool -genkeypair -v \
             -keystore "$HOME/.android/debug.keystore" \
