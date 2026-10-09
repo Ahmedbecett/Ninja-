@@ -255,7 +255,8 @@ jobs:
           retention-days: 2
 
   build:
-    if: always()
+    # Respect manual cancellation; always() can keep this job alive after cancel.
+    if: ${{ !cancelled() }}
     needs: [prepare-assets, prepare-main-world, prepare-fuji]
     runs-on: ubuntu-latest
     timeout-minutes: 30
