@@ -60,13 +60,19 @@ func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     trunk.material_override=_mat(Color(0.08,0.04,0.02,1),0.9)
     trunk.position.y=1.7
     tree.add_child(trunk)
-    var crown:=MeshInstance3D.new()
-    var cm:=SphereMesh.new()
-    cm.radius=1.35; cm.height=2.5
-    crown.mesh=cm
-    crown.material_override=_mat(Color(0.015,0.075,0.045,1),0.96)
-    crown.position.y=3.45
-    tree.add_child(crown)
+    var pine_mat := _mat(Color(0.012,0.065,0.038,1),0.96)
+    var pine_light := _mat(Color(0.025,0.105,0.052,1),0.96)
+    for tier in range(3):
+        var crown := MeshInstance3D.new()
+        var cm := CylinderMesh.new()
+        cm.top_radius = 0.04
+        cm.bottom_radius = 1.35 - float(tier) * 0.29
+        cm.height = 1.65 - float(tier) * 0.16
+        cm.radial_segments = 9
+        crown.mesh = cm
+        crown.material_override = pine_mat if tier % 2 == 0 else pine_light
+        crown.position.y = 2.55 + float(tier) * 0.78
+        tree.add_child(crown)
     add_child(tree)
 
     var body:=StaticBody3D.new()
@@ -80,6 +86,27 @@ func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     add_child(body)
 
 
+
+func _make_gabled_roof(parent:Node3D,pos:Vector3,footprint:Vector2,ridge_height:float,mat:Material)->MeshInstance3D:
+    var half_w := footprint.x * 0.5
+    var half_d := footprint.y * 0.5
+    var lf := Vector3(-half_w,0,-half_d)
+    var rf := Vector3(half_w,0,-half_d)
+    var pf := Vector3(0,ridge_height,-half_d)
+    var lb := Vector3(-half_w,0,half_d)
+    var rb := Vector3(half_w,0,half_d)
+    var pb := Vector3(0,ridge_height,half_d)
+    var st := SurfaceTool.new()
+    st.begin(Mesh.PRIMITIVE_TRIANGLES)
+    for p in [lf,pf,pb, lf,pb,lb, rf,pb,pf, rf,rb,pb, lf,rf,pf, lb,pb,rb]:
+        st.add_vertex(p)
+    st.generate_normals()
+    var roof := MeshInstance3D.new()
+    roof.mesh = st.commit()
+    roof.material_override = mat
+    roof.position = pos
+    parent.add_child(roof)
+    return roof
 
 func _make_box(parent:Node3D,pos:Vector3,size:Vector3,mat:Material)->MeshInstance3D:
     var n:=MeshInstance3D.new()
@@ -97,7 +124,7 @@ func _make_house(pos:Vector3,rot:float,wood:Material,roof_mat:Material)->void:
     house.rotation.y=rot
     add_child(house)
     _make_box(house,Vector3(0,1.4,0),Vector3(5.5,2.8,4.2),wood)
-    _make_box(house,Vector3(0,3.0,0),Vector3(6.2,0.35,4.9),roof_mat)
+    _make_gabled_roof(house,Vector3(0,2.8,0),Vector2(6.2,4.9),1.15,roof_mat)
     _make_box(house,Vector3(0,1.25,-2.13),Vector3(1.15,2.1,0.08),_mat(Color(0.025,0.018,0.012,1),0.7))
     for x in [-1.75,1.75]:
         _make_box(house,Vector3(x,1.35,-2.18),Vector3(0.72,1.0,0.08),_mat(Color(0.16,0.10,0.05,1),0.65))
@@ -171,7 +198,7 @@ func _make_dojo(pos:Vector3)->void:
     var dark:=_mat(Color(0.025,0.018,0.014,1),0.88)
     for x in [-4.0,4.0]:
         _make_box(self,pos+Vector3(x,2.0,0),Vector3(0.35,4.0,7.0),wood)
-    _make_box(self,pos+Vector3(0,3.8,0),Vector3(8.6,0.45,7.4),dark)
+    _make_gabled_roof(self,pos+Vector3(0,3.55,0),Vector2(8.6,7.4),1.45,dark)
     _make_box(self,pos+Vector3(0,1.5,-3.5),Vector3(7.8,3.0,0.3),wood)
     _make_box(self,pos+Vector3(0,1.5,3.5),Vector3(7.8,3.0,0.3),wood)
     for x in [-2.8,0,2.8]:
@@ -194,11 +221,45 @@ func _make_river()->void:
     _make_box(self,Vector3(0,-0.03,3.0),Vector3(80,0.08,5.2),water)
 
 func _make_bamboo_grove()->void:
-    var green:=_mat(Color(0.035,0.16,0.07,1),0.86)
-    for x in range(-28,-10,3):
-        for z in range(10,28,3):
-            var h:float=4.0+abs(sin(float(x*z)))*3.0
-            _make_box(self,Vector3(x,h*0.5,z),Vector3(0.18,h,0.18),green)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 67291
+    var green := _mat(Color(0.035,0.16,0.07,1),0.86)
+    var light_green := _mat(Color(0.075,0.22,0.09,1),0.84)
+    for x in range(-29,-9,2):
+        for z in range(9,29,2):
+            if rng.randf() < 0.18:
+                continue
+            var h:float = rng.randf_range(4.0,7.2)
+            var stalk := MeshInstance3D.new()
+            var stalk_mesh := CylinderMesh.new()
+            stalk_mesh.top_radius = 0.055
+            stalk_mesh.bottom_radius = 0.09
+            stalk_mesh.height = h
+            stalk_mesh.radial_segments = 7
+            stalk.mesh = stalk_mesh
+            stalk.material_override = green if rng.randf() < 0.7 else light_green
+            stalk.position = Vector3(float(x)+rng.randf_range(-0.45,0.45),h*0.5,float(z)+rng.randf_range(-0.45,0.45))
+            stalk.rotation.z = rng.randf_range(-0.06,0.06)
+            add_child(stalk)
+            for joint_y in range(1,int(h/1.2)):
+                var joint := MeshInstance3D.new()
+                var joint_mesh := CylinderMesh.new()
+                joint_mesh.top_radius = 0.095
+                joint_mesh.bottom_radius = 0.095
+                joint_mesh.height = 0.055
+                joint.mesh = joint_mesh
+                joint.material_override = light_green
+                joint.position = stalk.position + Vector3(0,float(joint_y)*1.2-h*0.5,0)
+                add_child(joint)
+            var leaves := MeshInstance3D.new()
+            var leaf_mesh := SphereMesh.new()
+            leaf_mesh.radius = 0.45
+            leaf_mesh.height = 0.24
+            leaves.mesh = leaf_mesh
+            leaves.material_override = light_green
+            leaves.position = stalk.position + Vector3(rng.randf_range(-0.25,0.25),h*0.48,0)
+            leaves.scale = Vector3(1.8,0.7,0.8)
+            add_child(leaves)
 
 func _make_trap(pos:Vector3,rng:RandomNumberGenerator)->void:
     var trap_script=preload("res://scripts/spike_trap.gd")
