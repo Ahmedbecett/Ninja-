@@ -18,8 +18,12 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y p7zip-full
-          mkdir -p assets/imported/forestpack
+          sudo apt-get install -y p7zip-full blender
+          mkdir -p assets/imported/forestpack assets/imported/characters
+          blender --background assets/characters/blender/mikasanew2.blend --python-expr "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/characters/mikasanew2.glb', export_format='GLB', export_animations=True)"
+          blender --background assets/characters/blender/Anime2.blend --python-expr "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/characters/Anime2.glb', export_format='GLB', export_animations=True)"
+          test -s assets/imported/characters/mikasanew2.glb
+          test -s assets/imported/characters/Anime2.glb
           7z x -y assets/source_archives/ForestPack.7z -oassets/imported/forestpack
           test -s assets/imported/forestpack/ForestPack.fbx
           echo "Extracted real forest FBX:"
