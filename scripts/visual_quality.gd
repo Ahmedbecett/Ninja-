@@ -33,7 +33,7 @@ func _build_terrain_details() -> void:
     var real_grass_available := ResourceLoader.exists("res://assets/world/grass/Grass.glb")
     # Avoid drawing hundreds of box-shaped blades on top of the real vegetation asset.
     if not real_grass_available:
-            for i in range(180):
+        for i in range(180):
             var p := Vector3(rng.randf_range(-radius,radius),0.0,rng.randf_range(-radius,radius))
             if abs(p.z-3.0) < 3.6:
                 continue
