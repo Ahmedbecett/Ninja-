@@ -260,6 +260,15 @@ jobs:
           name: ninja-fuji
           path: assets/imported/world
 
+      - name: Remove invalid Grass GLB pointer in the build workspace
+        run: |
+          set -euo pipefail
+          grass="assets/world/grass/Grass.glb"
+          if [ -f "$grass" ] && head -c 100 "$grass" | grep -q "version https://git-lfs.github.com/spec/v1"; then
+            rm -f "$grass"
+            echo "Removed unresolved LFS pointer; procedural vegetation fallback will be used."
+          fi
+
       - name: Generate safe build textures if source files are Git LFS pointers
         run: |
           set -euo pipefail
