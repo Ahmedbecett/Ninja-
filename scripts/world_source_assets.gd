@@ -1,7 +1,7 @@
 extends Node3D
 class_name WorldSourceAssets
 
-@export_file("*.glb", "*.gltf") var primary_world_path := "res://assets/imported/world/22.glb"
+@export_file("*.glb", "*.gltf") var primary_world_path := "res://assets/imported/world/world_22.glb"
 @export_file("*.glb", "*.gltf") var fuji_path := "res://assets/imported/world/japanfuji.glb"
 @export var primary_world_max_span := 82.0
 @export var fuji_max_span := 115.0
