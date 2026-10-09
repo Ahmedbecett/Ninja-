@@ -397,7 +397,11 @@ else:
           echo "Debug keystore configured."
 
       - name: Validate project
-        run: godot --headless --path . --editor --quit
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          # Prevent project import/validation from occupying the runner indefinitely.
+          timeout --signal=TERM --kill-after=15s 4m godot --headless --path . --editor --quit
 
       - name: Export Android
         run: |
