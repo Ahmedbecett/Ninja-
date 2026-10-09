@@ -1,4 +1,16 @@
-# NINJA — Real Game Production Status
+# NINJA — Shadow Protocol
+
+## 📥 DIRECT DOWNLOAD (Android APK)
+
+**[⬇️ DOWNLOAD NINJA.apk (v1.0)](https://github.com/Ahmedbecett/Ninja-/releases/download/v1.0/NINJA.apk)**
+
+- Direct link: https://github.com/Ahmedbecett/Ninja-/releases/download/v1.0/NINJA.apk
+- Release page: https://github.com/Ahmedbecett/Ninja-/releases/tag/v1.0
+- Platform: Android (arm64-v8a), debug-signed build.
+- Contains the real imported world: textured village & watchtowers, real character models, 39-species grass pack, sakura grove, day lighting and the full 12-mission English story campaign.
+
+---
+
 
 NINJA is being developed as a real third-person 3D action game, not a static mockup.
 
