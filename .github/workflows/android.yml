@@ -216,11 +216,14 @@ jobs:
           if test -s "$src" && ! head -c 100 "$src" | grep -q "version https://git-lfs.github.com/spec/v1"; then
             # Some Ubuntu Blender builds are compiled without the Alembic importer.
             # Detect that before invoking it, so an optional Fuji source cannot fail the APK build.
-            blender --background --threads 2 --python-expr "
-import bpy, os, sys
+            cat > /tmp/convert_fuji.py <<'PY'
+import bpy
+import os
+
 src = os.path.abspath('assets/world/source/japanfuji.abc')
 dst = os.path.abspath('assets/imported/world/japanfuji.glb')
 operator = getattr(getattr(bpy.ops, 'wm', None), 'alembic_import', None)
+
 if operator is None or not operator.poll():
     print('Alembic importer is unavailable in this Blender build; keeping procedural Fuji fallback.')
 else:
@@ -236,7 +239,8 @@ else:
         print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
         if os.path.exists(dst):
             os.remove(dst)
-"
+PY
+            blender --background --threads 2 --python /tmp/convert_fuji.py"
           else
             echo "japanfuji.abc is unavailable as a real LFS asset; the procedural Fuji fallback remains active."
           fi
