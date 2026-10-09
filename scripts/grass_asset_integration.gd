@@ -15,8 +15,8 @@ func _ready() -> void:
     call_deferred("_load_and_place")
 
 func _load_and_place() -> void:
-    if not ResourceLoader.exists(grass_scene_path):
-        push_warning("NINJA: Grass.glb is not present at %s; keeping procedural vegetation active." % grass_scene_path)
+    if not ResourceLoader.exists(grass_scene_path) or _is_lfs_pointer(grass_scene_path):
+        push_warning("NINJA: Grass.glb is missing or is only a Git LFS pointer; keeping procedural vegetation active.")
         return
 
     var packed := load(grass_scene_path) as PackedScene
@@ -87,3 +87,10 @@ func _safe_position(index: int) -> Vector3:
     if p.distance_to(Vector3(0.0, 0.0, 5.0)) < min_distance_from_player:
         p += Vector3(7.0, 0.0, 7.0)
     return p
+func _is_lfs_pointer(path: String) -> bool:
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return false
+    var header := file.get_buffer(80).get_string_from_utf8()
+    file.close()
+    return header.begins_with("version https://git-lfs.github.com/spec/v1")
