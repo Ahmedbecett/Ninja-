@@ -68,7 +68,7 @@ func _calculate_bounds(root: Node3D) -> AABB:
             var mesh_instance := current as MeshInstance3D
             if mesh_instance.mesh != null:
                 var local_bounds := mesh_instance.get_aabb()
-                var transformed := mesh_instance.global_transform * local_bounds
+                var transformed := local_bounds * mesh_instance.global_transform
                 if not found:
                     combined = transformed
                     found = true
