@@ -19,7 +19,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y p7zip-full blender
-          mkdir -p assets/imported/forestpack assets/imported/characters
+          mkdir -p assets/imported/forestpack assets/imported/characters assets/imported/world
 
           is_real_asset() {
             local file="$1"
@@ -39,6 +39,27 @@ jobs:
               echo "Optional character source unavailable (missing/LFS pointer): $src"
             fi
           done
+
+          # Convert the supplied Blender world and Alembic Fuji scene into
+          # Godot-importable GLB assets. Missing source files are non-fatal;
+          # the game keeps its procedural fallback until they are uploaded.
+          world_source="assets/world/source/22.blend"
+          if is_real_asset "$world_source"; then
+            blender --background "$world_source" --python-expr               "import bpy; bpy.ops.export_scene.gltf(filepath='assets/imported/world/22.glb', export_format='GLB', export_apply=True, export_animations=False)"
+            test -s assets/imported/world/22.glb
+            echo "Exported primary world model."
+          else
+            echo "22.blend not uploaded as a real binary yet; using procedural world fallback."
+          fi
+
+          fuji_source="assets/world/source/japanfuji.abc"
+          if is_real_asset "$fuji_source"; then
+            blender --background --python-expr               "import bpy; bpy.ops.wm.alembic_import(filepath='assets/world/source/japanfuji.abc'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True, export_animations=False)"
+            test -s assets/imported/world/japanfuji.glb
+            echo "Converted Mount Fuji Alembic scene to GLB."
+          else
+            echo "japanfuji.abc not uploaded as a real binary yet; Fuji backdrop will be omitted."
+          fi
 
           archive="assets/source_archives/ForestPack.7z"
           if is_real_asset "$archive"; then
