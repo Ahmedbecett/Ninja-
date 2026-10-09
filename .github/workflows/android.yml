@@ -217,29 +217,29 @@ jobs:
             # Some Ubuntu Blender builds are compiled without the Alembic importer.
             # Detect that before invoking it, so an optional Fuji source cannot fail the APK build.
             cat > /tmp/convert_fuji.py <<'PY'
-import bpy
-import os
-
-src = os.path.abspath('assets/world/source/japanfuji.abc')
-dst = os.path.abspath('assets/imported/world/japanfuji.glb')
-operator = getattr(getattr(bpy.ops, 'wm', None), 'alembic_import', None)
-
-if operator is None or not operator.poll():
-    print('Alembic importer is unavailable in this Blender build; keeping procedural Fuji fallback.')
-else:
-    try:
-        result = operator(filepath=src)
-        if 'FINISHED' not in result:
-            raise RuntimeError('Alembic import did not finish')
-        bpy.ops.export_scene.gltf(filepath=dst, export_format='GLB', export_apply=True)
-        if not os.path.isfile(dst) or os.path.getsize(dst) == 0:
-            raise RuntimeError('Fuji GLB export was empty')
-        print('Mount Fuji model exported successfully.')
-    except Exception as exc:
-        print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
-        if os.path.exists(dst):
-            os.remove(dst)
-PY
+          import bpy
+          import os
+          
+          src = os.path.abspath('assets/world/source/japanfuji.abc')
+          dst = os.path.abspath('assets/imported/world/japanfuji.glb')
+          operator = getattr(getattr(bpy.ops, 'wm', None), 'alembic_import', None)
+          
+          if operator is None or not operator.poll():
+              print('Alembic importer is unavailable in this Blender build; keeping procedural Fuji fallback.')
+          else:
+              try:
+                  result = operator(filepath=src)
+                  if 'FINISHED' not in result:
+                      raise RuntimeError('Alembic import did not finish')
+                  bpy.ops.export_scene.gltf(filepath=dst, export_format='GLB', export_apply=True)
+                  if not os.path.isfile(dst) or os.path.getsize(dst) == 0:
+                      raise RuntimeError('Fuji GLB export was empty')
+                  print('Mount Fuji model exported successfully.')
+              except Exception as exc:
+                  print('Optional Fuji conversion failed; keeping procedural fallback:', repr(exc))
+                  if os.path.exists(dst):
+                      os.remove(dst)
+          PY
             blender --background --threads 2 --python /tmp/convert_fuji.py"
           else
             echo "japanfuji.abc is unavailable as a real LFS asset; the procedural Fuji fallback remains active."
