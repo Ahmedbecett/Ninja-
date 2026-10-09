@@ -17,6 +17,7 @@ var reward_label:Label
 var weapon_button:Button
 
 func _ready()->void:
+    add_to_group("game_hud")
     health_bar=_bar(Vector2(32,32),Vector2(300,24),100)
     stamina_bar=_bar(Vector2(32,62),Vector2(300,18),100)
     status=Label.new()
