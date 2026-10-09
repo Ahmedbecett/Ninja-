@@ -34,6 +34,10 @@ func _load_and_place() -> void:
     _collect_grass_meshes(source, candidates)
 
     if candidates.is_empty():
+        # Some asset packs use generic node names. Fall back to every mesh so
+        # a valid imported vegetation scene is not silently ignored.
+        _collect_all_meshes(source, candidates)
+    if candidates.is_empty():
         source.queue_free()
         push_warning("NINJA: Grass.glb contains no suitable MeshInstance3D nodes.")
         return
@@ -59,6 +63,15 @@ func _collect_grass_meshes(root: Node, output: Array[MeshInstance3D]) -> void:
     while not stack.is_empty() and output.size() < instance_count:
         var current: Node = stack.pop_back()
         if current is MeshInstance3D and current.mesh != null and _looks_like_vegetation(current.name):
+            output.append(current as MeshInstance3D)
+        for child in current.get_children():
+            stack.append(child)
+
+func _collect_all_meshes(root: Node, output: Array[MeshInstance3D]) -> void:
+    var stack: Array[Node] = [root]
+    while not stack.is_empty() and output.size() < instance_count:
+        var current: Node = stack.pop_back()
+        if current is MeshInstance3D and current.mesh != null:
             output.append(current as MeshInstance3D)
         for child in current.get_children():
             stack.append(child)
