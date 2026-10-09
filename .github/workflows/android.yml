@@ -32,16 +32,6 @@ jobs:
             ! head -c 100 "$file" | grep -q "version https://git-lfs.github.com/spec/v1"
           }
 
-          abc_source="assets/world/source/japanfuji.abc"
-          if is_real_asset "$abc_source"; then
-            blender --background --python-expr \
-              "import bpy; bpy.ops.wm.alembic_import(filepath='${abc_source}'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True)"
-            test -s assets/imported/world/japanfuji.glb
-            echo "Converted japanfuji.abc to assets/imported/world/japanfuji.glb"
-          else
-            echo "japanfuji.abc source not present as a real binary; runtime will show the Fuji mountain fallback."
-          fi
-
           for name in mikasanew2 Anime2; do
             src="assets/characters/blender/${name}.blend"
             dst="assets/imported/characters/${name}.glb"
@@ -202,9 +192,45 @@ jobs:
           if-no-files-found: error
           retention-days: 2
 
+  prepare-fuji:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and download Git LFS assets
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Convert Mount Fuji Alembic source
+        timeout-minutes: 20
+        env:
+          OMP_NUM_THREADS: "2"
+          OPENBLAS_NUM_THREADS: "1"
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          mkdir -p assets/imported/world
+          src="assets/world/source/japanfuji.abc"
+          if test -s "$src" && ! head -c 100 "$src" | grep -q "version https://git-lfs.github.com/spec/v1"; then
+            blender --background --threads 2 --python-expr "import bpy; bpy.ops.wm.alembic_import(filepath='assets/world/source/japanfuji.abc'); bpy.ops.export_scene.gltf(filepath='assets/imported/world/japanfuji.glb', export_format='GLB', export_apply=True)"
+            test -s assets/imported/world/japanfuji.glb
+            echo "Mount Fuji model exported successfully."
+          else
+            echo "japanfuji.abc is unavailable as a real LFS asset; the procedural Fuji fallback remains active."
+          fi
+
+      - name: Upload Mount Fuji model
+        if: success() && hashFiles('assets/imported/world/japanfuji.glb') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ninja-fuji
+          path: assets/imported/world/japanfuji.glb
+          if-no-files-found: error
+          retention-days: 2
+
   build:
     if: always()
-    needs: [prepare-assets, prepare-main-world]
+    needs: [prepare-assets, prepare-main-world, prepare-fuji]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and download Git LFS assets
@@ -225,6 +251,13 @@ jobs:
         continue-on-error: true
         with:
           name: ninja-main-world
+          path: assets/imported/world
+
+      - name: Download converted Fuji model when available
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: ninja-fuji
           path: assets/imported/world
 
       - name: Generate safe build textures if source files are Git LFS pointers
