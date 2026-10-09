@@ -12,7 +12,47 @@ var base_y := 0.0
 var phase := 0.0
 
 func _ready() -> void:
+    if _load_imported_character():
+        return
     _build()
+
+func _load_imported_character() -> bool:
+    # The Android build converts the real Blender source files to GLB first.
+    # Keep the procedural rig only as a fallback if an export/import fails.
+    var model_path := "res://assets/imported/characters/Anime2.glb" if enemy else "res://assets/imported/characters/mikasanew2.glb"
+    if not ResourceLoader.exists(model_path):
+        push_warning("NINJA: Imported character unavailable; using fallback rig: %s" % model_path)
+        return false
+    var packed := load(model_path) as PackedScene
+    if packed == null:
+        push_warning("NINJA: Character GLB could not be loaded; using fallback rig: %s" % model_path)
+        return false
+    var model := packed.instantiate() as Node3D
+    if model == null:
+        push_warning("NINJA: Character GLB root is not Node3D; using fallback rig.")
+        return false
+    model.name = "ImportedCharacterModel"
+    model.position = Vector3.ZERO
+    model.scale = Vector3.ONE
+    add_child(model)
+    var animations := _find_animation_player(model)
+    if animations != null and animations.has_animation("RESET"):
+        animations.play("RESET")
+    elif animations != null:
+        var names := animations.get_animation_list()
+        if not names.is_empty():
+            animations.play(names[0])
+    print("NINJA: Loaded imported character model: ", model_path)
+    return true
+
+func _find_animation_player(root: Node) -> AnimationPlayer:
+    if root is AnimationPlayer:
+        return root as AnimationPlayer
+    for child in root.get_children():
+        var found := _find_animation_player(child)
+        if found != null:
+            return found
+    return null
 
 func _mat(color: Color, metallic := 0.0, roughness := 0.65) -> StandardMaterial3D:
     var m := StandardMaterial3D.new()
@@ -155,6 +195,8 @@ func _apply_weapon_visual() -> void:
         blade_mesh.material_override=blade_mat
 
 func animate_state(speed: float, attacking: bool) -> void:
+    if left_leg == null or right_leg == null or left_arm == null or right_arm == null or not is_instance_valid(sword):
+        return
     phase += speed * 0.08
     var stride := sin(phase) * minf(speed * 0.08, 0.55)
     left_leg.rotation.x = stride
