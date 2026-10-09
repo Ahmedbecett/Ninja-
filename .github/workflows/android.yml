@@ -159,7 +159,14 @@ jobs:
           test -d "$SDK_PATH"
           test -x "$SDK_PATH/platform-tools/adb"
           test -d "$JAVA_HOME"
-          mkdir -p "$HOME/.config/godot"
+          mkdir -p "$HOME/.config/godot" build
+          # Godot needs a valid debug keystore for Android APK export.
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US" -noprompt
+          # Keep export settings explicit and usable in a clean CI runner.
           cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
           [gd_resource type="EditorSettings" format=3]
 
@@ -167,9 +174,20 @@ jobs:
 
           export/android/android_sdk_path = "$SDK_PATH"
           export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$HOME/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
           EOF
+          # Also fill the preset-level debug signing fields; never require a
+          # private release keystore to produce a development/test APK.
+          sed -i \
+            -e "s|^keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|" \
+            -e 's|^keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|' \
+            -e 's|^keystore/debug_password=\"\"|keystore/debug_password=\"android\"|' \
+            export_presets.cfg
           echo "Android SDK: $SDK_PATH"
           echo "Java SDK: $JAVA_HOME"
+          echo "Debug keystore configured."
 
       - name: Validate project
         run: godot --headless --path . --editor --quit
