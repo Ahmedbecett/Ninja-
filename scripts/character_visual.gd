@@ -10,6 +10,8 @@ var right_leg: Node3D
 var sword: Node3D
 var base_y := 0.0
 var phase := 0.0
+var imported_model: Node3D
+var _char_foot_offset := 0.0
 
 func _ready() -> void:
     if _load_imported_character():
@@ -32,9 +34,8 @@ func _load_imported_character() -> bool:
         push_warning("NINJA: Character GLB root is not Node3D; using fallback rig.")
         return false
     model.name = "ImportedCharacterModel"
-    model.position = Vector3.ZERO
-    model.scale = Vector3.ONE
     add_child(model)
+    _normalize_character(model)
     var animations := _find_animation_player(model)
     if animations != null and animations.has_animation("RESET"):
         animations.play("RESET")
@@ -42,8 +43,41 @@ func _load_imported_character() -> bool:
         var names := animations.get_animation_list()
         if not names.is_empty():
             animations.play(names[0])
+    imported_model = model
     print("NINJA: Loaded imported character model: ", model_path)
     return true
+
+func _normalize_character(model: Node3D) -> void:
+    # Source rigs ship at arbitrary scales/offsets; fit them to a 1.8 m
+    # humanoid footprint so gameplay collision and the camera stay correct.
+    var bounds := AABB()
+    var found := false
+    var stack: Array[Node] = [model]
+    while not stack.is_empty():
+        var current: Node = stack.pop_back()
+        if current is MeshInstance3D and (current as MeshInstance3D).mesh != null:
+            var local := (current as MeshInstance3D).get_aabb()
+            var world := local * (current as Node3D).global_transform * model.global_transform.affine_inverse()
+            if not found:
+                bounds = world
+                found = true
+            else:
+                bounds = bounds.merge(world)
+        for child in current.get_children():
+            stack.append(child)
+    if not found or bounds.size.y < 0.01:
+        model.position = Vector3.ZERO
+        model.scale = Vector3.ONE
+        return
+    var target_height := 1.8
+    var factor := target_height / bounds.size.y
+    model.scale = Vector3.ONE * factor
+    _char_foot_offset = bounds.position.y * factor
+    model.position = Vector3(
+        -bounds.get_center().x * factor,
+        -_char_foot_offset,
+        -bounds.get_center().z * factor
+    )
 
 func _find_animation_player(root: Node) -> AnimationPlayer:
     if root is AnimationPlayer:
@@ -195,6 +229,15 @@ func _apply_weapon_visual() -> void:
         blade_mesh.material_override=blade_mat
 
 func animate_state(speed: float, attacking: bool) -> void:
+    if is_instance_valid(imported_model):
+        # Subtle locomotion life for skinned imports that carry no walk clip.
+        phase += speed * 0.09
+        var bob := absf(sin(phase)) * minf(speed * 0.012, 0.06)
+        imported_model.position.y = -_char_foot_offset + bob
+        imported_model.rotation.x = sin(phase) * minf(speed * 0.004, 0.03)
+        if attacking:
+            imported_model.rotation.y = sin(phase * 4.0) * 0.06
+        return
     if left_leg == null or right_leg == null or left_arm == null or right_arm == null or not is_instance_valid(sword):
         return
     phase += speed * 0.08

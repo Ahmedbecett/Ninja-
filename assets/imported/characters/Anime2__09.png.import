@@ -1,0 +1,37 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://dmvxtl0stuoxp"
+path="res://.godot/imported/Anime2__09.png-f861eac19856ad06f79b6822e6d5dd75.ctex"
+metadata={
+"vram_texture": false
+}
+generator_parameters={
+"md5": "0aa5eadf58511084418c73a0db7ef8cc"
+}
+
+[deps]
+
+source_file="res://assets/imported/characters/Anime2__09.png"
+dest_files=["res://.godot/imported/Anime2__09.png-f861eac19856ad06f79b6822e6d5dd75.ctex"]
+
+[params]
+
+compress/mode=0
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=1

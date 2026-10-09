@@ -5,7 +5,9 @@ const SHOTS := [
     {"time": 0.0, "title": "WHEN THE MOON TURNED RED", "caption": "The night the Ashen Village burned, the empire erased every name but one."},
     {"time": 4.0, "title": "ONE SURVIVOR", "caption": "A young shinobi woke beneath the ashes, with a broken oath and a blade that remembered."},
     {"time": 8.0, "title": "THE SHADOW CITADEL", "caption": "Beyond the cedar forest, the warlord Kurogane gathers the souls of the fallen."},
-    {"time": 12.0, "title": "YOUR OATH BEGINS", "caption": "Cross the river. Follow the lanterns. Find the truth before dawn."}
+    {"time": 12.0, "title": "YOUR OATH BEGINS", "caption": "Cross the river. Follow the lanterns. Find the truth before dawn."},
+    {"time": 16.0, "title": "THE BAMBOO WHISPERS", "caption": "In the grove, hunters become hunted. Every shadow wears Kurogane's crest."},
+    {"time": 20.0, "title": "THE IRON SHOGUN", "caption": "Behind the citadel walls, the Iron Shogun forges an empire from stolen names. One blade refuses to kneel."}
 ]
 
 var _finished := false

@@ -1,5 +1,4 @@
 extends Node
-class_name WeaponSystem
 
 signal weapon_changed
 
@@ -61,7 +60,7 @@ func cycle_weapon() -> void:
             weapon_changed.emit()
             return
 
-func get_name() -> String:
+func get_display_name() -> String:
     return str(get_current().name)
 
 func get_save_data() -> Dictionary:

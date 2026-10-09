@@ -32,8 +32,11 @@ func _generate()->void:
             _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
     # Imported 3D world takes priority over the block-built prototype.
     # Keep the handcrafted fallback only when no real world model was imported.
+    var village_loaded := false
     if not has_imported_world:
-        _make_village(wood_mat,roof_mat)
+        village_loaded = _load_village_map()
+        if not village_loaded:
+            _make_village(wood_mat,roof_mat)
         _make_dojo(Vector3(23,0,21))
         _make_castle_gate(Vector3(-22,0,21))
         _make_river()
@@ -41,6 +44,88 @@ func _generate()->void:
     if not has_imported_world:
         for i in range(12):
             _make_trap(Vector3(rng.randf_range(-radius+3.0,radius-3.0),0.03,rng.randf_range(-radius+3.0,radius-3.0)),rng)
+        _make_sakura_grove(rng)
+
+func _make_sakura_grove(rng: RandomNumberGenerator) -> void:
+    # Pink blossom trees echoing the reference art direction.
+    var trunk_mat := _mat(Color(0.16, 0.09, 0.06, 1), 0.9)
+    var blossom := _mat(Color(0.93, 0.55, 0.66, 1), 0.85)
+    var blossom_light := _mat(Color(0.98, 0.72, 0.80, 1), 0.85)
+    for i in range(26):
+        var angle := rng.randf_range(0.0, TAU)
+        var dist := rng.randf_range(6.0, 30.0)
+        var pos := Vector3(cos(angle) * dist, 0.0, -20.0 + sin(angle) * dist * 0.8)
+        if abs(pos.z - 3.0) < 4.0:
+            continue
+        var tree := Node3D.new()
+        tree.position = pos
+        add_child(tree)
+        var h := rng.randf_range(2.6, 4.2)
+        var trunk := MeshInstance3D.new()
+        var tm := CylinderMesh.new()
+        tm.top_radius = 0.09
+        tm.bottom_radius = 0.16
+        tm.height = h
+        trunk.mesh = tm
+        trunk.material_override = trunk_mat
+        trunk.position.y = h * 0.5
+        tree.add_child(trunk)
+        for c in range(3):
+            var crown := MeshInstance3D.new()
+            var cm := SphereMesh.new()
+            cm.radius = rng.randf_range(0.9, 1.5) - float(c) * 0.25
+            cm.height = cm.radius * 1.5
+            crown.mesh = cm
+            crown.material_override = blossom if c % 2 == 0 else blossom_light
+            crown.position = Vector3(rng.randf_range(-0.5, 0.5), h + 0.35 + float(c) * 0.45, rng.randf_range(-0.5, 0.5))
+            tree.add_child(crown)
+
+func _load_village_map() -> bool:
+    # Real UV-mapped village (houses, watchtowers, street lamps, rocks)
+    # converted from the production FBX scene; replaces the box prototype.
+    var path := "res://assets/imported/world/village_map.glb"
+    if not ResourceLoader.exists(path):
+        return false
+    var packed := load(path) as PackedScene
+    if packed == null:
+        push_warning("NINJA: village_map.glb failed to load; keeping prototype village.")
+        return false
+    var inst := packed.instantiate() as Node3D
+    if inst == null:
+        return false
+    inst.name = "VillageMap"
+    inst.position = Vector3(0.0, 0.0, -20.0)
+    add_child(inst)
+    _add_lantern_lights(inst)
+    print("NINJA: Loaded real village map (textured houses/towers/lamps).")
+    return true
+
+func _add_lantern_lights(root: Node3D) -> void:
+    for child in root.get_children():
+        if not child.name.begins_with("Street lamp"):
+            continue
+        var top := 2.0
+        if child is MeshInstance3D:
+            top = (child as MeshInstance3D).get_aabb().size.y
+        var glow := MeshInstance3D.new()
+        var lm := SphereMesh.new()
+        lm.radius = 0.16
+        lm.height = 0.3
+        glow.mesh = lm
+        var mat := StandardMaterial3D.new()
+        mat.albedo_color = Color(1.0, 0.5, 0.16, 1)
+        mat.emission_enabled = true
+        mat.emission = Color(1.0, 0.42, 0.12, 1)
+        mat.emission_energy_multiplier = 6.0
+        glow.material_override = mat
+        glow.position = child.position + Vector3(0.0, top * 0.92, 0.0)
+        root.add_child(glow)
+        var light := OmniLight3D.new()
+        light.light_color = Color(1.0, 0.5, 0.18, 1)
+        light.light_energy = 2.6
+        light.omni_range = 8.0
+        light.position = child.position + Vector3(0.0, top * 0.95, 0.0)
+        root.add_child(light)
 
 func _make_tree(pos:Vector3,rng:RandomNumberGenerator)->void:
     var tree:=Node3D.new()

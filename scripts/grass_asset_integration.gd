@@ -1,7 +1,7 @@
 extends Node3D
 class_name GrassAssetIntegration
 
-@export_file("*.glb") var grass_scene_path := "res://assets/world/grass/Grass.glb"
+@export_file("*.glb") var grass_scene_path := "res://assets/world/grass/Grass_pack.glb"
 @export_range(1, 160, 1) var instance_count := 72
 @export var world_radius := 34.0
 @export var min_distance_from_player := 5.0
@@ -37,12 +37,10 @@ func _load_and_place() -> void:
 
     add_child(source)
     var candidates: Array[MeshInstance3D] = []
-    _collect_grass_meshes(source, candidates)
-
+    # The pack is pre-curated (39 vegetation meshes); use every mesh in it.
+    _collect_all_meshes(source, candidates)
     if candidates.is_empty():
-        # Some asset packs use generic node names. Fall back to every mesh so
-        # a valid imported vegetation scene is not silently ignored.
-        _collect_all_meshes(source, candidates)
+        _collect_grass_meshes(source, candidates)
     if candidates.is_empty():
         source.queue_free()
         push_warning("NINJA: Grass.glb contains no suitable MeshInstance3D nodes.")

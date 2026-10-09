@@ -71,7 +71,7 @@ func _build_terrain_details() -> void:
     var grass2 := _mat(Color(0.055,0.14,0.065,1),0.98)
     var stone := _mat(Color(0.13,0.14,0.145,1),0.92)
     var soil := _mat(Color(0.095,0.065,0.045,1),1.0)
-    var real_grass_available := _is_real_asset("res://assets/world/grass/Grass.glb")
+    var real_grass_available := _is_real_asset("res://assets/world/grass/Grass_pack.glb")
     if not real_grass_available:
         for i in range(260):
             var p := Vector3(rng.randf_range(-radius,radius),0.0,rng.randf_range(-radius,radius))

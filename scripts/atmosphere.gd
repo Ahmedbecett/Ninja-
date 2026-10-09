@@ -1,7 +1,7 @@
 extends Node3D
 
-var time_of_day := 0.18
-var cycle_speed := 0.004
+var time_of_day := 0.03
+var cycle_speed := 0.00012
 var environment: WorldEnvironment
 var moon: DirectionalLight3D
 var rim: DirectionalLight3D
@@ -17,12 +17,12 @@ func _process(delta:float) -> void:
     var sun_angle=time_of_day*TAU
     if moon:
         moon.rotation_degrees=Vector3(-42.0+sin(sun_angle)*30.0, -25.0+cos(sun_angle)*50.0, 0)
-        moon.light_energy=0.22+0.55*maxf(0.0,cos(sun_angle))
+        moon.light_energy=0.35+1.05*maxf(0.0,cos(sun_angle))
     if rim:
         rim.light_energy=0.08+0.25*maxf(0.0,sin(sun_angle))
     if environment and environment.environment:
         var night=1.0-maxf(0.0,cos(sun_angle))
-        environment.environment.ambient_light_energy=0.35+0.35*(1.0-night)
+        environment.environment.ambient_light_energy=0.45+0.55*(1.0-night)
         environment.environment.fog_density=0.006+night*0.010
 
 func _build_rain()->void:

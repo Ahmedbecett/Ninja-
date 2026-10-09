@@ -35,18 +35,18 @@ func _ready()->void:
     add_child(quest_label)
     coin_icon=TextureRect.new()
     coin_icon.texture=load("res://assets/ui/coin_icon.png")
-    coin_icon.position=Vector2(338,201)
-    coin_icon.size=Vector2(28,28)
     coin_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-    coin_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    coin_icon.stretch_mode=TextureRect.STRETCH_SCALE
+    coin_icon.position=Vector2(338,201)
     add_child(coin_icon)
+    coin_icon.size=Vector2(28,28)
     shuriken_icon=TextureRect.new()
     shuriken_icon.texture=load("res://assets/ui/shuriken_icon.svg")
-    shuriken_icon.position=Vector2(338,235)
-    shuriken_icon.size=Vector2(28,28)
     shuriken_icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-    shuriken_icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    shuriken_icon.stretch_mode=TextureRect.STRETCH_SCALE
+    shuriken_icon.position=Vector2(338,235)
     add_child(shuriken_icon)
+    shuriken_icon.size=Vector2(28,28)
     equipment_label=Label.new()
     equipment_label.position=Vector2(372,198)
     equipment_label.add_theme_font_size_override("font_size",15)
@@ -103,7 +103,7 @@ func _process(_delta:float)->void:
     if is_instance_valid(CampaignSystem):
         campaign_label.text="STAGE %d  //  %s\nMISSION  //  %s" % [CampaignSystem.current_level, CampaignSystem.get_level_name(), CampaignSystem.get_mission_text()]
     equipment_label.text="COINS %d    //    SHURIKEN %d    //    SKILL POINTS %d" % [GameState.coins,GameState.shurikens,Progression.skill_points]
-    weapon_label.text="WEAPON  //  %s" % WeaponSystem.get_name()
+    weapon_label.text="WEAPON  //  %s" % WeaponSystem.get_display_name()
     reward_label.text="GRAPHICS  //  %s" % GraphicsSettings.get_label()
     if CampaignSystem.notice != "":
         reward_label.text += "    //    " + CampaignSystem.notice

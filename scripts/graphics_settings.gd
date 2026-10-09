@@ -1,10 +1,9 @@
 extends Node
-class_name GraphicsSettings
 
 enum Level { LOW, MEDIUM, HIGH, ULTRA, K4 }
 
 const SAVE_PATH := "user://graphics.cfg"
-var level: int = Level.HIGH
+var level: int = Level.ULTRA
 var labels := ["Low","Medium","High","Ultra","4K"]
 
 func _ready() -> void:
