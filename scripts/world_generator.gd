@@ -22,7 +22,9 @@ func _generate()->void:
     # Only suppress placeholder trees and rocks after the imported forest has
     # actually instantiated. File existence alone does not prove the FBX loaded.
     var forest_loader := get_node_or_null("ImportedForest") as ImportedEnvironment
-    var has_real_forest := forest_loader != null and is_instance_valid(forest_loader.loaded_environment)
+    var source_assets := get_node_or_null("WorldSourceAssets") as WorldSourceAssets
+    var has_imported_world := source_assets != null and source_assets.has_primary_world()
+    var has_real_forest := has_imported_world or (forest_loader != null and is_instance_valid(forest_loader.loaded_environment))
     if not has_real_forest:
         for i in range(65):
             var rock:=MeshInstance3D.new()
@@ -37,11 +39,14 @@ func _generate()->void:
             add_child(rock)
         for i in range(24):
             _make_tree(Vector3(rng.randf_range(-radius,radius),0,rng.randf_range(-radius,radius)),rng)
-    _make_village(wood_mat,roof_mat)
-    _make_dojo(Vector3(23,0,21))
-    _make_castle_gate(Vector3(-22,0,21))
-    _make_river()
-    _make_bamboo_grove()
+    # Imported 3D world takes priority over the block-built prototype.
+    # Keep the handcrafted fallback only when no real world model was imported.
+    if not has_imported_world:
+        _make_village(wood_mat,roof_mat)
+        _make_dojo(Vector3(23,0,21))
+        _make_castle_gate(Vector3(-22,0,21))
+        _make_river()
+        _make_bamboo_grove()
     for i in range(12):
         _make_trap(Vector3(rng.randf_range(-radius+3.0,radius-3.0),0.03,rng.randf_range(-radius+3.0,radius-3.0)),rng)
 
