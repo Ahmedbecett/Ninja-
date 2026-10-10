@@ -295,7 +295,10 @@ func _make_river()->void:
     water.emission_enabled=true
     water.emission=Color(0.0,0.025,0.05,1)
     water.emission_energy_multiplier=0.35
-    _make_box(self,Vector3(0,-0.03,3.0),Vector3(80,0.08,5.2),water)
+    _make_box(self,Vector3(0,-0.03,3.0),Vector3(80,0.08,6.8),water)
+    _make_arched_bridge(Vector3(0,0,3.0))
+    _make_torii_gate(Vector3(-18,0,-12))
+    _make_torii_gate(Vector3(18,0,-12))
 
 func _make_bamboo_grove()->void:
     var rng := RandomNumberGenerator.new()
@@ -346,3 +349,46 @@ func _make_trap(pos:Vector3,rng:RandomNumberGenerator)->void:
     trap.set_script(trap_script)
     trap.position=pos
     add_child(trap)
+
+func _make_arched_bridge(pos: Vector3) -> void:
+    # Traditional Japanese arched wooden bridge (Taiko-bashi) matching reference art
+    var wood := _mat(Color(0.24, 0.12, 0.08, 1.0), 0.85)
+    var red_lacquer := _mat(Color(0.68, 0.16, 0.12, 1.0), 0.55)
+    # Bridge deck arch
+    for i in range(-5, 6):
+        var t := float(i) / 5.0
+        var arch_h := (1.0 - t * t) * 0.95 + 0.35
+        _make_box(self, pos + Vector3(0, arch_h, float(i) * 0.7), Vector3(3.8, 0.18, 0.75), wood)
+        # Railings
+        _make_box(self, pos + Vector3(-1.85, arch_h + 0.65, float(i) * 0.7), Vector3(0.12, 0.85, 0.75), red_lacquer)
+        _make_box(self, pos + Vector3(1.85, arch_h + 0.65, float(i) * 0.7), Vector3(0.12, 0.85, 0.75), red_lacquer)
+    # Stone lanterns at bridge entrance
+    _make_stone_toro_lantern(pos + Vector3(-2.8, 0.0, -4.2))
+    _make_stone_toro_lantern(pos + Vector3(2.8, 0.0, -4.2))
+    _make_stone_toro_lantern(pos + Vector3(-2.8, 0.0, 4.2))
+    _make_stone_toro_lantern(pos + Vector3(2.8, 0.0, 4.2))
+
+func _make_stone_toro_lantern(pos: Vector3) -> void:
+    var stone := _mat(Color(0.38, 0.40, 0.42, 1.0), 0.92)
+    var glow := _mat(Color(1.0, 0.72, 0.28, 1.0), 0.2)
+    glow.emission_enabled = true
+    glow.emission = Color(1.0, 0.65, 0.2, 1.0)
+    glow.emission_energy_multiplier = 2.2
+    # Base, post, lamp chamber, and pagoda cap
+    _make_box(self, pos + Vector3(0, 0.15, 0), Vector3(0.65, 0.3, 0.65), stone)
+    _make_box(self, pos + Vector3(0, 0.65, 0), Vector3(0.28, 0.7, 0.28), stone)
+    _make_box(self, pos + Vector3(0, 1.15, 0), Vector3(0.42, 0.32, 0.42), glow)
+    _make_box(self, pos + Vector3(0, 1.45, 0), Vector3(0.75, 0.18, 0.75), stone)
+
+func _make_torii_gate(pos: Vector3) -> void:
+    # Traditional Vermilion Torii Shrine Gate
+    var vermilion := _mat(Color(0.82, 0.18, 0.12, 1.0), 0.65)
+    var black := _mat(Color(0.08, 0.08, 0.09, 1.0), 0.8)
+    # Main Pillars (Hashira)
+    _make_box(self, pos + Vector3(-2.4, 3.2, 0), Vector3(0.45, 6.4, 0.45), vermilion)
+    _make_box(self, pos + Vector3(2.4, 3.2, 0), Vector3(0.45, 6.4, 0.45), vermilion)
+    # Top Crossbeams (Kasagi & Shimaki)
+    _make_box(self, pos + Vector3(0, 6.3, 0), Vector3(6.6, 0.45, 0.55), vermilion)
+    _make_box(self, pos + Vector3(0, 6.7, 0), Vector3(7.2, 0.35, 0.65), black)
+    # Lower tie beam (Nuki)
+    _make_box(self, pos + Vector3(0, 5.0, 0), Vector3(5.6, 0.35, 0.35), vermilion)
